@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.models.event import Event
-from app.models.attendance import Attendance
+from app.models.attendance import Attendance  # SQLAlchemy model (for DB)
 from app.models.user import User
 from app.schemas.event import EventCreate, EventRead  # Pydantic models for creating/reading events
-from app.schemas.qr import QRTokenResponse
+from app.schemas.attendance import AttendanceResponse  # Pydantic model for attendance response
+from app.schemas.qr import QRTokenResponse  # Import QRTokenResponse Pydantic model
 from app.core.database import get_db
-from app.utils.security import create_qr_token  # Function to generate QR code
+from app.utils.qr import create_qr_token  # Function to generate QR code
 from datetime import datetime
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -33,8 +34,7 @@ def create_event(
     db.add(event)
     db.commit()
     db.refresh(event)
-    return EventRead.model_validate(event)  # Convert SQLAlchemy model to Pydantic model
-
+    return EventRead.model_validate(event)
 
 # GET /events - List all events
 @router.get("", response_model=list[EventRead])
@@ -42,8 +42,7 @@ def list_events(
     db: Session = Depends(get_db),
 ) -> list[EventRead]:
     events = db.query(Event).all()
-    return [EventRead.model_validate(event) for event in events]  # Convert to Pydantic models
-
+    return [EventRead.model_validate(event) for event in events]
 
 # GET /events/{event_id} - Get a single event by ID
 @router.get("/{event_id}", response_model=EventRead)
@@ -57,8 +56,7 @@ def get_event(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Event not found.",
         )
-    return EventRead.model_validate(event)  # Convert SQLAlchemy model to Pydantic model
-
+    return EventRead.model_validate(event)
 
 # POST /events/{event_id}/qr - Generate QR for event
 @router.post("/{event_id}/qr", response_model=QRTokenResponse)
@@ -73,12 +71,14 @@ def generate_event_qr(
             detail="Event not found.",
         )
 
-    qr_token = create_qr_token(event_id=event.id)
+    # Generate the QR code for the event
+    qr_token = create_qr_token(event_id=event.id)  # Pass the actual integer value, not the column
+    
+    # Return QR token and the generated QR code as part of the response
     return QRTokenResponse(event_id=event.id, qr_token=qr_token)
 
-
 # POST /events/{event_id}/scan - Mark attendance for an event
-@router.post("/{event_id}/scan", response_model=Attendance)
+@router.post("/{event_id}/scan", response_model=AttendanceResponse)
 def scan_qr(event_id: int, user_id: int, db: Session = Depends(get_db)):
     # Check if event exists
     event = db.get(Event, event_id)
@@ -106,4 +106,4 @@ def scan_qr(event_id: int, user_id: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(attendance)
     
-    return attendance
+    return AttendanceResponse.model_validate(attendance)  # Convert SQLAlchemy model to Pydantic model
