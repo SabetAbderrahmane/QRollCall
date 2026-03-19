@@ -1,0 +1,24 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.3.3, pluggy-1.6.0 -- c:\Users\Administrator\Desktop\work\marco\App\qr_attend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend
+plugins: anyio-4.12.1
+collecting ... collected 15 items
+
+tests/test_attendance.py::test_mark_attendance_success PASSED
+tests/test_attendance.py::test_mark_attendance_duplicate PASSED
+tests/test_attendance.py::test_mark_attendance_invalid_qr PASSED
+tests/test_auth.py::test_verify_token_requires_header PASSED
+tests/test_auth.py::test_sync_user_from_token_success PASSED
+tests/test_auth.py::test_get_current_user_success PASSED
+tests/test_events.py::test_create_event PASSED
+tests/test_events.py::test_list_events PASSED
+tests/test_events.py::test_get_event_not_found PASSED
+tests/test_qr_validation.py::test_validate_qr_success PASSED
+tests/test_qr_validation.py::test_validate_qr_invalid_token PASSED
+tests/test_qr_validation.py::test_validate_qr_outside_geofence PASSED
+tests/test_reports.py::test_dashboard_report PASSED
+tests/test_reports.py::test_event_report PASSED
+tests/test_reports.py::test_export_event_report_csv PASSED
+
+============================= 15 passed in 1.36s ==============================
