@@ -93,6 +93,28 @@ class AttendanceRepository:
         self.db.refresh(attendance)
         return attendance
 
+    def update_scan_result(
+        self,
+        attendance: Attendance,
+        *,
+        scanned_at,
+        status: AttendanceStatus,
+        scan_latitude: float,
+        scan_longitude: float,
+        device_id: str | None,
+        rejection_reason: str | None,
+    ) -> Attendance:
+        attendance.scanned_at = scanned_at
+        attendance.status = status
+        attendance.scan_latitude = scan_latitude
+        attendance.scan_longitude = scan_longitude
+        attendance.device_id = device_id
+        attendance.rejection_reason = rejection_reason
+
+        self.db.commit()
+        self.db.refresh(attendance)
+        return attendance
+
     def delete(self, attendance: Attendance) -> None:
         self.db.delete(attendance)
         self.db.commit()

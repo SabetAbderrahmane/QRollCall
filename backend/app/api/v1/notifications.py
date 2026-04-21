@@ -1,7 +1,10 @@
 # backend/app/api/v1/notifications.py
 from fastapi import APIRouter, HTTPException, Query, status
 
-from app.api.deps import DbSession
+from app.api.deps import CurrentUser, DbSession
+from app.core.permissions import require_active_user, require_admin
+from app.models.notification import Notification
+from app.repositories.notification_repository import NotificationRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.notification import (
     MarkNotificationReadRequest,
@@ -11,16 +14,34 @@ from app.schemas.notification import (
     NotificationUpdate,
 )
 from app.services.notification_service import NotificationService
-from app.repositories.notification_repository import NotificationRepository
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
+
+
+def _require_notification_access(
+    notification: Notification,
+    current_user,
+) -> None:
+    active_user = require_active_user(current_user)
+
+    if active_user.is_admin:
+        return
+
+    if notification.user_id != active_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to access this resource",
+        )
 
 
 @router.post("", response_model=NotificationResponse, status_code=status.HTTP_201_CREATED)
 def create_notification(
     payload: NotificationCreate,
     db: DbSession,
+    current_user: CurrentUser,
 ) -> NotificationResponse:
+    require_admin(current_user)
+
     user_repository = UserRepository(db)
     user = user_repository.get_by_id(payload.user_id)
 
@@ -38,17 +59,29 @@ def create_notification(
 @router.get("", response_model=NotificationListResponse)
 def list_notifications(
     db: DbSession,
+    current_user: CurrentUser,
     user_id: int | None = Query(default=None, ge=1),
     is_read: bool | None = Query(default=None),
     event_id: int | None = Query(default=None, ge=1),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
 ) -> NotificationListResponse:
+    active_user = require_active_user(current_user)
+
+    effective_user_id = user_id
+    if not active_user.is_admin:
+        if user_id is not None and user_id != active_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this resource",
+            )
+        effective_user_id = active_user.id
+
     service = NotificationService(NotificationRepository(db))
     items, total = service.list_notifications(
         skip=skip,
         limit=limit,
-        user_id=user_id,
+        user_id=effective_user_id,
         is_read=is_read,
         event_id=event_id,
     )
@@ -56,24 +89,10 @@ def list_notifications(
 
 
 @router.get("/{notification_id}", response_model=NotificationResponse)
-def get_notification(notification_id: int, db: DbSession) -> NotificationResponse:
-    service = NotificationService(NotificationRepository(db))
-    notification = service.get_notification(notification_id)
-
-    if notification is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Notification not found",
-        )
-
-    return NotificationResponse.model_validate(notification)
-
-
-@router.put("/{notification_id}", response_model=NotificationResponse)
-def update_notification(
+def get_notification(
     notification_id: int,
-    payload: NotificationUpdate,
     db: DbSession,
+    current_user: CurrentUser,
 ) -> NotificationResponse:
     service = NotificationService(NotificationRepository(db))
     notification = service.get_notification(notification_id)
@@ -84,6 +103,27 @@ def update_notification(
             detail="Notification not found",
         )
 
+    _require_notification_access(notification, current_user)
+    return NotificationResponse.model_validate(notification)
+
+
+@router.put("/{notification_id}", response_model=NotificationResponse)
+def update_notification(
+    notification_id: int,
+    payload: NotificationUpdate,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> NotificationResponse:
+    service = NotificationService(NotificationRepository(db))
+    notification = service.get_notification(notification_id)
+
+    if notification is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Notification not found",
+        )
+
+    _require_notification_access(notification, current_user)
     updated_notification = service.update_notification(notification, payload)
     return NotificationResponse.model_validate(updated_notification)
 
@@ -93,6 +133,7 @@ def mark_notification_read(
     notification_id: int,
     payload: MarkNotificationReadRequest,
     db: DbSession,
+    current_user: CurrentUser,
 ) -> NotificationResponse:
     service = NotificationService(NotificationRepository(db))
     notification = service.get_notification(notification_id)
@@ -103,12 +144,17 @@ def mark_notification_read(
             detail="Notification not found",
         )
 
+    _require_notification_access(notification, current_user)
     updated_notification = service.mark_read(notification, is_read=payload.is_read)
     return NotificationResponse.model_validate(updated_notification)
 
 
 @router.delete("/{notification_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_notification(notification_id: int, db: DbSession) -> None:
+def delete_notification(
+    notification_id: int,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> None:
     service = NotificationService(NotificationRepository(db))
     notification = service.get_notification(notification_id)
 
@@ -118,4 +164,5 @@ def delete_notification(notification_id: int, db: DbSession) -> None:
             detail="Notification not found",
         )
 
+    _require_notification_access(notification, current_user)
     service.delete_notification(notification)

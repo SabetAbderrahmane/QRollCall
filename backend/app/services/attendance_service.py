@@ -36,13 +36,6 @@ class AttendanceService:
         if not event.is_active:
             raise ValueError("Event is not active")
 
-        existing_attendance = self.attendance_repository.get_by_event_and_user(
-            event_id=event.id,
-            user_id=user.id,
-        )
-        if existing_attendance is not None:
-            raise ValueError(ATTENDANCE_ALREADY_MARKED)
-
         scan_time = utc_now()
         validation = qr_service.validate_event_qr(
             event=event,
@@ -57,6 +50,25 @@ class AttendanceService:
         if not validation["valid"]:
             status_value = AttendanceStatus.REJECTED
             rejection_reason = validation["reason"]
+
+        existing_attendance = self.attendance_repository.get_by_event_and_user(
+            event_id=event.id,
+            user_id=user.id,
+        )
+
+        if existing_attendance is not None:
+            if existing_attendance.status == AttendanceStatus.REJECTED:
+                return self.attendance_repository.update_scan_result(
+                    existing_attendance,
+                    scanned_at=scan_time,
+                    status=status_value,
+                    scan_latitude=payload.scan_latitude,
+                    scan_longitude=payload.scan_longitude,
+                    device_id=payload.device_id,
+                    rejection_reason=rejection_reason,
+                )
+
+            raise ValueError(ATTENDANCE_ALREADY_MARKED)
 
         return self.attendance_repository.create(
             event_id=event.id,

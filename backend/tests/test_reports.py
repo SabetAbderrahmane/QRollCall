@@ -3,6 +3,7 @@ from datetime import timedelta
 from app.models.attendance import Attendance, AttendanceStatus
 from app.models.event import Event
 from app.models.user import User, UserRole
+from app.services.auth_service import AuthService
 from app.utils.datetime_utils import utc_now
 
 
@@ -80,47 +81,141 @@ def create_report_attendance(db_session, event_id: int, user_id: int) -> Attenda
     return attendance
 
 
-def test_dashboard_report(client, db_session):
+def install_auth_mock(monkeypatch, token_claims_map: dict[str, dict]) -> None:
+    def mock_verify_firebase_token(self, authorization):
+        assert authorization is not None
+        scheme, token = authorization.split(" ", 1)
+        assert scheme == "Bearer"
+        assert token in token_claims_map
+        return token_claims_map[token]
+
+    monkeypatch.setattr(
+        AuthService,
+        "verify_firebase_token",
+        mock_verify_firebase_token,
+    )
+
+
+def auth_headers(token: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {token}"}
+
+
+def test_dashboard_report_is_admin_only(client, db_session, monkeypatch):
     admin = create_report_admin(db_session)
     student = create_report_student(db_session)
     event = create_report_event(db_session, admin.id)
     create_report_attendance(db_session, event.id, student.id)
 
-    response = client.get("/api/v1/reports/dashboard")
+    install_auth_mock(
+        monkeypatch,
+        {
+            "report-admin-token": {
+                "uid": admin.firebase_uid,
+                "email": admin.email,
+                "name": admin.full_name,
+            },
+            "report-student-token": {
+                "uid": student.firebase_uid,
+                "email": student.email,
+                "name": student.full_name,
+            },
+        },
+    )
 
-    assert response.status_code == 200
-    data = response.json()
+    student_response = client.get(
+        "/api/v1/reports/dashboard",
+        headers=auth_headers("report-student-token"),
+    )
+    assert student_response.status_code == 403
+    assert student_response.json()["detail"] == "Admin access required"
+
+    admin_response = client.get(
+        "/api/v1/reports/dashboard",
+        headers=auth_headers("report-admin-token"),
+    )
+    assert admin_response.status_code == 200
+    data = admin_response.json()
     assert data["total_users"] >= 2
     assert data["total_events"] >= 1
     assert data["total_attendance_records"] >= 1
     assert data["total_present"] >= 1
 
 
-def test_event_report(client, db_session):
+def test_event_report_requires_admin(client, db_session, monkeypatch):
     admin = create_report_admin(db_session)
     student = create_report_student(db_session)
     event = create_report_event(db_session, admin.id)
     create_report_attendance(db_session, event.id, student.id)
 
-    response = client.get(f"/api/v1/reports/events/{event.id}")
+    install_auth_mock(
+        monkeypatch,
+        {
+            "event-report-admin-token": {
+                "uid": admin.firebase_uid,
+                "email": admin.email,
+                "name": admin.full_name,
+            },
+            "event-report-student-token": {
+                "uid": student.firebase_uid,
+                "email": student.email,
+                "name": student.full_name,
+            },
+        },
+    )
 
-    assert response.status_code == 200
-    data = response.json()
+    student_response = client.get(
+        f"/api/v1/reports/events/{event.id}",
+        headers=auth_headers("event-report-student-token"),
+    )
+    assert student_response.status_code == 403
+    assert student_response.json()["detail"] == "Admin access required"
+
+    admin_response = client.get(
+        f"/api/v1/reports/events/{event.id}",
+        headers=auth_headers("event-report-admin-token"),
+    )
+    assert admin_response.status_code == 200
+    data = admin_response.json()
     assert data["event_id"] == event.id
     assert data["event_name"] == event.name
     assert data["present_count"] >= 1
 
 
-def test_export_event_report_csv(client, db_session):
+def test_export_event_report_csv_requires_admin(client, db_session, monkeypatch):
     admin = create_report_admin(db_session)
     student = create_report_student(db_session)
     event = create_report_event(db_session, admin.id)
     create_report_attendance(db_session, event.id, student.id)
 
-    response = client.get(f"/api/v1/reports/export/event/{event.id}?format=csv")
+    install_auth_mock(
+        monkeypatch,
+        {
+            "export-report-admin-token": {
+                "uid": admin.firebase_uid,
+                "email": admin.email,
+                "name": admin.full_name,
+            },
+            "export-report-student-token": {
+                "uid": student.firebase_uid,
+                "email": student.email,
+                "name": student.full_name,
+            },
+        },
+    )
 
-    assert response.status_code == 200
-    data = response.json()
+    student_response = client.get(
+        f"/api/v1/reports/export/event/{event.id}?format=csv",
+        headers=auth_headers("export-report-student-token"),
+    )
+    assert student_response.status_code == 403
+    assert student_response.json()["detail"] == "Admin access required"
+
+    admin_response = client.get(
+        f"/api/v1/reports/export/event/{event.id}?format=csv",
+        headers=auth_headers("export-report-admin-token"),
+    )
+    assert admin_response.status_code == 200
+    data = admin_response.json()
     assert data["format"] == "csv"
     assert data["file_name"].endswith(".csv")
     assert "storage/reports/" in data["file_path"]

@@ -1,7 +1,8 @@
 # backend/app/api/v1/reports.py
 from fastapi import APIRouter, HTTPException, Query, status
 
-from app.api.deps import DbSession
+from app.api.deps import CurrentUser, DbSession
+from app.core.permissions import require_admin
 from app.schemas.report import (
     DashboardSummaryResponse,
     EventAttendanceSummary,
@@ -24,13 +25,22 @@ def _raise_report_http_error(message: str) -> None:
 
 
 @router.get("/dashboard", response_model=DashboardSummaryResponse)
-def get_dashboard_summary(db: DbSession) -> DashboardSummaryResponse:
+def get_dashboard_summary(
+    db: DbSession,
+    current_user: CurrentUser,
+) -> DashboardSummaryResponse:
+    require_admin(current_user)
     service = ReportService(db)
     return service.get_dashboard_summary()
 
 
 @router.get("/events/{event_id}", response_model=EventAttendanceSummary)
-def get_event_report(event_id: int, db: DbSession) -> EventAttendanceSummary:
+def get_event_report(
+    event_id: int,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> EventAttendanceSummary:
+    require_admin(current_user)
     service = ReportService(db)
 
     try:
@@ -40,7 +50,12 @@ def get_event_report(event_id: int, db: DbSession) -> EventAttendanceSummary:
 
 
 @router.get("/users/{user_id}", response_model=UserAttendanceSummary)
-def get_user_report(user_id: int, db: DbSession) -> UserAttendanceSummary:
+def get_user_report(
+    user_id: int,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> UserAttendanceSummary:
+    require_admin(current_user)
     service = ReportService(db)
 
     try:
@@ -53,7 +68,9 @@ def get_user_report(user_id: int, db: DbSession) -> UserAttendanceSummary:
 def export_report(
     payload: ExportReportRequest,
     db: DbSession,
+    current_user: CurrentUser,
 ) -> ExportReportResponse:
+    require_admin(current_user)
     service = ReportService(db)
 
     try:
@@ -68,8 +85,10 @@ def export_report(
 def export_event_report(
     event_id: int,
     db: DbSession,
+    current_user: CurrentUser,
     format: str = Query(..., pattern="^(csv|pdf)$"),
 ) -> ExportReportResponse:
+    require_admin(current_user)
     service = ReportService(db)
 
     try:
@@ -82,8 +101,10 @@ def export_event_report(
 def export_user_report(
     user_id: int,
     db: DbSession,
+    current_user: CurrentUser,
     format: str = Query(..., pattern="^(csv|pdf)$"),
 ) -> ExportReportResponse:
+    require_admin(current_user)
     service = ReportService(db)
 
     try:

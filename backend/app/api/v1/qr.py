@@ -1,8 +1,9 @@
 # backend/app/api/v1/qr.py
 from fastapi import APIRouter, HTTPException, status
 
-from app.api.deps import DbSession
+from app.api.deps import CurrentUser, DbSession
 from app.core.constants import ERROR_EVENT_NOT_FOUND
+from app.core.permissions import require_active_user, require_admin
 from app.schemas.qr import (
     QRCodeGenerateRequest,
     QRCodeGenerateResponse,
@@ -24,7 +25,9 @@ router = APIRouter(prefix="/qr", tags=["qr"])
 def generate_qr_code(
     payload: QRCodeGenerateRequest,
     db: DbSession,
+    current_user: CurrentUser,
 ) -> QRCodeGenerateResponse:
+    require_admin(current_user)
     event_service = EventService(db)
 
     try:
@@ -48,7 +51,12 @@ def generate_qr_code(
 
 
 @router.get("/event/{event_id}", response_model=QRCodeImageResponse)
-def get_event_qr_code(event_id: int, db: DbSession) -> QRCodeImageResponse:
+def get_event_qr_code(
+    event_id: int,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> QRCodeImageResponse:
+    require_admin(current_user)
     event_service = EventService(db)
 
     try:
@@ -73,7 +81,9 @@ def get_event_qr_code(event_id: int, db: DbSession) -> QRCodeImageResponse:
 def validate_qr_code(
     payload: QRCodeValidateRequest,
     db: DbSession,
+    current_user: CurrentUser,
 ) -> QRCodeValidateResponse:
+    require_active_user(current_user)
     event_service = EventService(db)
     event = event_service.get_event_by_qr_token(payload.token)
 
