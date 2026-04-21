@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.constants import (
     ATTENDANCE_ALREADY_MARKED,
+    ERROR_ATTENDANCE_NOT_FOUND,
     ERROR_EVENT_NOT_FOUND,
     ERROR_INVALID_QR_TOKEN,
     ERROR_USER_NOT_FOUND,
@@ -23,8 +24,8 @@ class AttendanceService:
         self.event_repository = EventRepository(db)
         self.user_repository = UserRepository(db)
 
-    def mark_attendance(self, payload: AttendanceMarkRequest) -> Attendance:
-        user = self.user_repository.get_by_id(payload.user_id)
+    def mark_attendance(self, payload: AttendanceMarkRequest, user_id: int) -> Attendance:
+        user = self.user_repository.get_by_id(user_id)
         if user is None:
             raise ValueError(ERROR_USER_NOT_FOUND)
 
@@ -37,7 +38,7 @@ class AttendanceService:
 
         existing_attendance = self.attendance_repository.get_by_event_and_user(
             event_id=event.id,
-            user_id=payload.user_id,
+            user_id=user.id,
         )
         if existing_attendance is not None:
             raise ValueError(ATTENDANCE_ALREADY_MARKED)
@@ -59,7 +60,7 @@ class AttendanceService:
 
         return self.attendance_repository.create(
             event_id=event.id,
-            user_id=payload.user_id,
+            user_id=user.id,
             scanned_at=scan_time,
             status=status_value,
             scan_latitude=payload.scan_latitude,
@@ -88,7 +89,7 @@ class AttendanceService:
     def require_attendance(self, attendance_id: int) -> Attendance:
         attendance = self.get_attendance(attendance_id)
         if attendance is None:
-            raise ValueError("Attendance not found")
+            raise ValueError(ERROR_ATTENDANCE_NOT_FOUND)
         return attendance
 
     def get_event_stats(self, event_id: int) -> dict:

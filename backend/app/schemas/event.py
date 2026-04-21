@@ -29,7 +29,7 @@ class EventBase(BaseModel):
 
 
 class EventCreate(EventBase):
-    created_by_user_id: int = Field(..., ge=1)
+    pass
 
 
 class EventUpdate(BaseModel):

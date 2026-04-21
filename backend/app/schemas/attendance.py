@@ -8,7 +8,6 @@ from app.models.attendance import AttendanceStatus
 
 class AttendanceMarkRequest(BaseModel):
     qr_code_token: str = Field(..., min_length=1, max_length=255)
-    user_id: int = Field(..., ge=1)
     scan_latitude: float = Field(..., ge=-90, le=90)
     scan_longitude: float = Field(..., ge=-180, le=180)
     device_id: Optional[str] = Field(default=None, max_length=255)

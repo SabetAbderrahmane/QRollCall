@@ -17,8 +17,8 @@ class EventService:
         self.event_repository = EventRepository(db)
         self.user_repository = UserRepository(db)
 
-    def create_event(self, payload: EventCreate) -> Event:
-        creator = self.user_repository.get_by_id(payload.created_by_user_id)
+    def create_event(self, payload: EventCreate, creator_user_id: int) -> Event:
+        creator = self.user_repository.get_by_id(creator_user_id)
         if creator is None:
             raise ValueError(ERROR_CREATOR_NOT_FOUND)
 
@@ -35,7 +35,7 @@ class EventService:
             qr_code_image_path=None,
             qr_validity_minutes=payload.qr_validity_minutes,
             is_active=payload.is_active,
-            created_by_user_id=payload.created_by_user_id,
+            created_by_user_id=creator_user_id,
         )
 
     def list_events(

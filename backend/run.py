@@ -1,6 +1,14 @@
-from app import create_app
+# backend/run.py
+import uvicorn
 
-app = create_app()
+from app.core.config import get_settings
+
+settings = get_settings()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=settings.APP_ENV == "development" and settings.DEBUG,
+    )
