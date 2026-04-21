@@ -1,0 +1,6 @@
+name: qr_attend
+description: A Flutter application for QR code attendance.
+version: 1.0.0+1
+
+environment:
+  sdk: '3.11.5'

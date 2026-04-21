@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+backend/.venv/
+
+# Environment files
+.env
+.env.*
+!.env.example
+backend/.env
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Local databases
+*.db
+*.sqlite3
+backend/test_qr_attend.db
+
+# Runtime / generated artifacts
+*.log
+test_output.txt
+backend/storage/reports/
+backend/storage/qr_codes/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

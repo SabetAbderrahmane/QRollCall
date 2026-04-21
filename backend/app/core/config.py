@@ -17,13 +17,14 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str = "change-me-in-production"
 
+    DATABASE_URL: str | None = None
     DB_HOST: str = "localhost"
     DB_PORT: int = 5432
     DB_NAME: str = "qr_attend"
     DB_USER: str = "postgres"
     DB_PASSWORD: str = "postgres"
 
-    CORS_ORIGINS: str = "*"
+    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
 
     FIREBASE_CREDENTIALS_PATH: str | None = None
 
@@ -40,16 +41,33 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        if self.DATABASE_URL and self.DATABASE_URL.strip():
+            return self.DATABASE_URL.strip()
+
         return (
             f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
 
     @property
+    def cors_allow_all(self) -> bool:
+        return self.CORS_ORIGINS.strip() == "*"
+
+    @property
     def cors_origin_list(self) -> list[str]:
-        if self.CORS_ORIGINS.strip() == "*":
+        if self.cors_allow_all:
             return ["*"]
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+
+        origins = [
+            origin.strip()
+            for origin in self.CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
+        return origins
+
+    @property
+    def is_production(self) -> bool:
+        return self.APP_ENV.lower() == "production"
 
 
 @lru_cache

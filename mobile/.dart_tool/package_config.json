@@ -1,0 +1,16 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "qr_attend",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "3.11"
+    }
+  ],
+  "generator": "pub",
+  "generatorVersion": "3.11.5",
+  "flutterRoot": "file:///C:/src/flutter",
+  "flutterVersion": "3.41.7",
+  "pubCache": "file:///C:/Users/Administrator/AppData/Local/Pub/Cache"
+}

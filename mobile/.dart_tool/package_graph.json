@@ -1,0 +1,14 @@
+{
+  "roots": [
+    "qr_attend"
+  ],
+  "packages": [
+    {
+      "name": "qr_attend",
+      "version": "1.0.0+1",
+      "dependencies": [],
+      "devDependencies": []
+    }
+  ],
+  "configVersion": 1
+}
