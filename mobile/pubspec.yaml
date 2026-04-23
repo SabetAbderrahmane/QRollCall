@@ -1,6 +1,25 @@
-name: qr_attend
-description: A Flutter application for QR code attendance.
+name: qrollcall_mobile
+description: QRollCall mobile attendance app
+publish_to: "none"
+
 version: 1.0.0+1
 
 environment:
-  sdk: '3.11.5'
+  sdk: ">=3.7.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.5+1
+  http: ^1.6.0
+  firebase_core: ^4.7.0
+  firebase_auth: ^6.4.0
+  google_sign_in: ^7.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

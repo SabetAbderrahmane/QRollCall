@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "883009921573",
+    "project_id": "qrattend-b061c",
+    "storage_bucket": "qrattend-b061c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883009921573:android:5292155459ee705a8315cc",
+        "android_client_info": {
+          "package_name": "com.example.qrollcall_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvRzA14b-aFWdYeSQXEvgBYGkekvED8sc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
