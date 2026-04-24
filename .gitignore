@@ -38,3 +38,4 @@ backend/storage/qr_codes/
 Thumbs.db
 .vscode/
 .idea/backend/firebase-service-account.json
+backend/firebase-service-account.json
