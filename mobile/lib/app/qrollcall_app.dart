@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../core/theme/app_theme.dart';
-import '../features/auth/presentation/controllers/auth_controller.dart';
-import '../features/auth/presentation/screens/login_screen.dart';
-import '../features/home/presentation/screens/home_screen.dart';
+import 'package:qrollcall_mobile/core/theme/app_theme.dart';
+import 'package:qrollcall_mobile/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:qrollcall_mobile/features/auth/presentation/screens/login_screen.dart';
+import 'package:qrollcall_mobile/features/dashboard/presentation/controllers/dashboard_controller.dart';
+import 'package:qrollcall_mobile/features/dashboard/presentation/screens/dashboard_screen.dart';
 
 class QRollCallApp extends StatelessWidget {
   const QRollCallApp({super.key});
@@ -39,6 +40,10 @@ class _AuthGate extends StatelessWidget {
       return const LoginScreen();
     }
 
-    return const HomeScreen();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DashboardController>().clear();
+    });
+
+    return const DashboardScreen();
   }
 }
