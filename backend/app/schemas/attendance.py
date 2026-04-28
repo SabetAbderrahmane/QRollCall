@@ -55,3 +55,34 @@ class AttendanceStatsResponse(BaseModel):
     present_count: int
     absent_count: int
     rejected_count: int
+
+
+class LiveAttendanceStudentResponse(BaseModel):
+    attendance_id: int
+    user_id: int
+    full_name: str
+    email: str
+    student_id: Optional[str] = None
+    profile_image_url: Optional[str] = None
+
+    status: str
+    scanned_at: datetime
+    entry_method: str
+    device_id: Optional[str] = None
+    rejection_reason: Optional[str] = None
+
+
+class LiveAttendanceResponse(BaseModel):
+    event_id: int
+    event_name: str
+    location_name: Optional[str] = None
+    start_time: datetime
+    end_time: Optional[datetime] = None
+    is_active: bool
+
+    total_records: int
+    present_count: int
+    absent_count: int
+    rejected_count: int
+
+    students: list[LiveAttendanceStudentResponse]

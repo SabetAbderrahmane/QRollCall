@@ -7,8 +7,10 @@ import 'package:qrollcall_mobile/features/admin_dashboard/presentation/widgets/a
 import 'package:qrollcall_mobile/features/admin_dashboard/presentation/widgets/admin_event_card.dart';
 import 'package:qrollcall_mobile/features/admin_dashboard/presentation/widgets/admin_stat_card.dart';
 import 'package:qrollcall_mobile/features/auth/presentation/controllers/auth_controller.dart';
-
-
+import 'package:qrollcall_mobile/features/auth/data/firebase_auth_service.dart';
+import 'package:qrollcall_mobile/features/live_attendance/data/live_attendance_api_service.dart';
+import 'package:qrollcall_mobile/features/live_attendance/presentation/controllers/live_attendance_controller.dart';
+import 'package:qrollcall_mobile/features/live_attendance/presentation/screens/live_attendance_screen.dart';
 import 'package:qrollcall_mobile/features/auth/data/firebase_auth_service.dart';
 import 'package:qrollcall_mobile/features/create_event/data/create_event_api_service.dart';
 import 'package:qrollcall_mobile/features/create_event/presentation/controllers/create_event_controller.dart';
@@ -175,6 +177,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         (event) => AdminEventCard(
                           event: event,
                           now: now,
+                          onOpenTap: () => _openLiveAttendance(event.id),
                           onEditTap: () => _showSoonMessage('Event editing will be added in the next batch.'),
                         ),
                       ),
@@ -260,6 +263,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           content: Text('Event created successfully. Admin dashboard refreshed.'),
         ),
       );
+    }
+  }
+
+  Future<void> _openLiveAttendance(int eventId) async {
+    final shouldRefresh = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => LiveAttendanceController(
+            eventId: eventId,
+            apiService: LiveAttendanceApiService(
+              firebaseAuthService: context.read<FirebaseAuthService>(),
+            ),
+          ),
+          child: const LiveAttendanceScreen(),
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (shouldRefresh == true) {
+      await context.read<AdminDashboardController>().refreshDashboard();
     }
   }
 

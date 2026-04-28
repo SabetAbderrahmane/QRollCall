@@ -18,6 +18,7 @@ import 'package:qrollcall_mobile/features/attendance_history/data/attendance_his
 import 'package:qrollcall_mobile/features/attendance_history/presentation/controllers/attendance_history_controller.dart';
 import 'package:qrollcall_mobile/features/attendance_history/presentation/screens/attendance_history_screen.dart';
 import 'package:qrollcall_mobile/features/auth/data/firebase_auth_service.dart';
+import 'package:qrollcall_mobile/features/profile/presentation/screens/profile_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -154,6 +155,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return;
     }
 
+    if (index == 3) {
+      await _openProfile();
+      return;
+    }
+
     _showSoonMessage(
       '${_tabs[index].label} page will be added in the next batch.',
     );
@@ -213,7 +219,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
         await _handleScanTap();
         break;
       case AttendanceHistoryExitAction.profile:
-        _showSoonMessage('Profile page will be added in the next batch.');
+        await _openProfile();
+        break;
+    }
+  }
+
+  Future<void> _openProfile() async {
+    final result = await Navigator.of(context).push<ProfileExitAction>(
+      MaterialPageRoute(
+        builder: (_) => const ProfileScreen(),
+      ),
+    );
+
+    if (!mounted || result == null) {
+      return;
+    }
+
+    switch (result) {
+      case ProfileExitAction.home:
+        setState(() => _selectedIndex = 0);
+        break;
+      case ProfileExitAction.scan:
+        await _handleScanTap();
+        break;
+      case ProfileExitAction.history:
+        await _openAttendanceHistory();
         break;
     }
   }

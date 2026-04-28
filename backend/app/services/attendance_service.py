@@ -111,6 +111,63 @@ class AttendanceService:
 
         return self.attendance_repository.stats_by_event(event_id)
 
+    def get_live_attendance_snapshot(self, event_id: int) -> dict:
+        event = self.event_repository.get_by_id(event_id)
+        if event is None:
+            raise ValueError(ERROR_EVENT_NOT_FOUND)
+
+        items, _ = self.attendance_repository.list(
+            skip=0,
+            limit=200,
+            event_id=event_id,
+        )
+        stats = self.attendance_repository.stats_by_event(event_id)
+
+        students = []
+
+        for attendance in items:
+            user = attendance.user
+
+            if hasattr(attendance.status, "value"):
+                status_value = attendance.status.value
+            else:
+                status_value = str(attendance.status)
+
+            device_id = attendance.device_id
+            entry_method = "In-app QR"
+            if device_id is None or str(device_id).strip() == "":
+                entry_method = "Manual Entry"
+
+            students.append(
+                {
+                    "attendance_id": attendance.id,
+                    "user_id": user.id,
+                    "full_name": user.full_name,
+                    "email": user.email,
+                    "student_id": user.student_id,
+                    "profile_image_url": user.profile_image_url,
+                    "status": status_value,
+                    "scanned_at": attendance.scanned_at,
+                    "entry_method": entry_method,
+                    "device_id": device_id,
+                    "rejection_reason": attendance.rejection_reason,
+                }
+            )
+
+        return {
+            "event_id": event.id,
+            "event_name": event.name,
+            "location_name": event.location_name,
+            "start_time": event.start_time,
+            "end_time": event.end_time,
+            "is_active": event.is_active,
+            "total_records": stats["total_records"],
+            "present_count": stats["present_count"],
+            "absent_count": stats["absent_count"],
+            "rejected_count": stats["rejected_count"],
+            "students": students,
+        }
+
     def update_attendance(self, attendance: Attendance, **kwargs) -> Attendance:
         return self.attendance_repository.update(attendance, **kwargs)
 

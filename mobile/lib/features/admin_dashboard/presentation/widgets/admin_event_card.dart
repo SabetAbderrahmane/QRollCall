@@ -8,11 +8,13 @@ class AdminEventCard extends StatelessWidget {
     super.key,
     required this.event,
     required this.now,
+    this.onOpenTap,
     this.onEditTap,
   });
 
   final AdminEventSummary event;
   final DateTime now;
+  final VoidCallback? onOpenTap;
   final VoidCallback? onEditTap;
 
   @override
@@ -76,94 +78,87 @@ class AdminEventCard extends StatelessWidget {
                 ),
           ),
           const SizedBox(height: 20),
-          if (isLive) ...[
-            Row(
-              children: [
-                Text(
-                  'Student Attendance',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          Row(
+            children: [
+              Text(
+                'Student Attendance',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const Spacer(),
+              RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.labelLarge,
+                  children: [
+                    TextSpan(
+                      text: '${event.presentCount}',
+                      style: const TextStyle(
+                        color: AppColors.primaryContainer,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '/${event.totalRecords}',
+                      style: const TextStyle(
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w700,
                       ),
-                ),
-                const Spacer(),
-                RichText(
-                  text: TextSpan(
-                    style: Theme.of(context).textTheme.labelLarge,
-                    children: [
-                      TextSpan(
-                        text: '${event.presentCount}',
-                        style: const TextStyle(
-                          color: AppColors.primaryContainer,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      TextSpan(
-                        text: '/${event.totalRecords}',
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
-                minHeight: 10,
-                value: event.attendanceProgress,
-                backgroundColor: const Color(0xFF172036),
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.primaryContainer,
+                    ),
+                  ],
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              minHeight: 10,
+              value: event.attendanceProgress,
+              backgroundColor: const Color(0xFF172036),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primaryContainer,
+              ),
             ),
-          ] else ...[
-            Row(
-              children: [
-                ...event.previewAudienceChips().map(
-                  (chip) => Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF18233B),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppColors.border,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        chip,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: onOpenTap,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryContainer,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
                     ),
                   ),
+                  icon: const Icon(Icons.monitor_heart_rounded, size: 19),
+                  label: const Text('Live Tracker'),
                 ),
-                const Spacer(),
-                OutlinedButton(
+              ),
+              const SizedBox(width: 12),
+              SizedBox(
+                height: 48,
+                child: OutlinedButton(
                   onPressed: onEditTap,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textPrimary,
                     backgroundColor: const Color(0xFF18233B),
                     side: const BorderSide(color: AppColors.border),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(18),
                     ),
                   ),
-                  child: const Text('Edit Details'),
+                  child: const Icon(Icons.edit_rounded, size: 19),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ],
       ),
     );

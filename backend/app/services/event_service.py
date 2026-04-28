@@ -82,5 +82,21 @@ class EventService:
 
         return event
 
+    def regenerate_qr_for_event(self, event_id: int) -> Event:
+        """
+        Rotate the backend QR token for an event.
+
+        This invalidates old QR codes because attendance validation uses
+        Event.qr_code_token to look up the event. Any old QR payload containing
+        the previous token will no longer match.
+        """
+        event = self.require_event(event_id)
+
+        return self.event_repository.update(
+            event,
+            qr_code_token=token_urlsafe(32),
+            qr_code_image_path=None,
+        )
+
     def get_event_by_qr_token(self, token: str) -> Event | None:
         return self.event_repository.get_by_qr_token(token)

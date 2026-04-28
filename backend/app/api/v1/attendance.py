@@ -14,6 +14,7 @@ from app.schemas.attendance import (
     AttendanceMarkRequest,
     AttendanceResponse,
     AttendanceStatsResponse,
+    LiveAttendanceResponse,
 )
 from app.services.attendance_service import AttendanceService
 
@@ -80,6 +81,23 @@ def list_attendance(
         user_id=effective_user_id,
     )
     return AttendanceListResponse(items=items, total=total)
+
+
+@router.get("/live/{event_id}", response_model=LiveAttendanceResponse)
+def get_live_attendance(
+    event_id: int,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> LiveAttendanceResponse:
+    require_admin(current_user)
+    service = AttendanceService(db)
+
+    try:
+        snapshot = service.get_live_attendance_snapshot(event_id)
+    except ValueError as exc:
+        _raise_attendance_http_error(str(exc))
+
+    return LiveAttendanceResponse(**snapshot)
 
 
 @router.get("/stats/{event_id}", response_model=AttendanceStatsResponse)
