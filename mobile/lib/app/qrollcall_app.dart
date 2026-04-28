@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:qrollcall_mobile/core/theme/app_theme.dart';
-import 'package:qrollcall_mobile/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:qrollcall_mobile/features/auth/presentation/screens/login_screen.dart';
-import 'package:qrollcall_mobile/features/dashboard/presentation/controllers/dashboard_controller.dart';
-import 'package:qrollcall_mobile/features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../core/theme/app_theme.dart';
+import '../features/admin_dashboard/data/admin_dashboard_api_service.dart';
+import '../features/admin_dashboard/presentation/controllers/admin_dashboard_controller.dart';
+import '../features/admin_dashboard/presentation/screens/admin_dashboard_screen.dart';
+import '../features/auth/data/firebase_auth_service.dart';
+import '../features/auth/presentation/controllers/auth_controller.dart';
+import '../features/auth/presentation/screens/login_screen.dart';
+import '../features/home/presentation/screens/home_screen.dart';
 
 class QRollCallApp extends StatelessWidget {
   const QRollCallApp({super.key});
@@ -40,10 +43,19 @@ class _AuthGate extends StatelessWidget {
       return const LoginScreen();
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DashboardController>().clear();
-    });
+    final role = authController.currentUser!.role.toUpperCase();
 
-    return const DashboardScreen();
+    if (role == 'ADMIN') {
+      return ChangeNotifierProvider(
+        create: (_) => AdminDashboardController(
+          apiService: AdminDashboardApiService(
+            firebaseAuthService: context.read<FirebaseAuthService>(),
+          ),
+        )..loadDashboard(),
+        child: const AdminDashboardScreen(),
+      );
+    }
+
+    return const HomeScreen();
   }
 }
