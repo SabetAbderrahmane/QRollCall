@@ -94,6 +94,21 @@ def update_event(
         _raise_event_http_error(str(exc))
 
     return EventResponse.model_validate(updated_event)
+@router.post("/{event_id}/regenerate-qr", response_model=EventResponse)
+def regenerate_event_qr(
+    event_id: int,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> EventResponse:
+    require_admin(current_user)
+    service = EventService(db)
+
+    try:
+        event = service.regenerate_qr_for_event(event_id)
+    except ValueError as exc:
+        _raise_event_http_error(str(exc))
+
+    return EventResponse.model_validate(event)
 
 
 @router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)

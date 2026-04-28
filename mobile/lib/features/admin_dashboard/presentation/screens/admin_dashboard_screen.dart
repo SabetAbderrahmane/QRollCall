@@ -8,6 +8,11 @@ import 'package:qrollcall_mobile/features/admin_dashboard/presentation/widgets/a
 import 'package:qrollcall_mobile/features/admin_dashboard/presentation/widgets/admin_stat_card.dart';
 import 'package:qrollcall_mobile/features/auth/presentation/controllers/auth_controller.dart';
 
+
+import 'package:qrollcall_mobile/features/auth/data/firebase_auth_service.dart';
+import 'package:qrollcall_mobile/features/create_event/data/create_event_api_service.dart';
+import 'package:qrollcall_mobile/features/create_event/presentation/controllers/create_event_controller.dart';
+import 'package:qrollcall_mobile/features/create_event/presentation/screens/create_event_screen.dart';
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
 
@@ -27,12 +32,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showSoonMessage('Create Event flow will be added in the next batch.'),
-        backgroundColor: AppColors.primaryContainer,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('+ Create New Event'),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: _CreateEventFloatingButton(
+        onTap: _openCreateEvent,
       ),
       bottomNavigationBar: _AdminBottomNavBar(
         selectedIndex: _selectedTabIndex,
@@ -232,6 +234,35 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
+  Future<void> _openCreateEvent() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => CreateEventController(
+            apiService: CreateEventApiService(
+              firebaseAuthService: context.read<FirebaseAuthService>(),
+            ),
+          ),
+          child: const CreateEventScreen(),
+        ),
+      ),
+    );
+
+    if (!mounted || created != true) {
+      return;
+    }
+
+    await context.read<AdminDashboardController>().refreshDashboard();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Event created successfully. Admin dashboard refreshed.'),
+        ),
+      );
+    }
+  }
+
   static String _firstName(String fullName) {
     final parts = fullName.trim().split(RegExp(r'\s+'));
     if (parts.isEmpty || parts.first.isEmpty) return 'Admin';
@@ -419,6 +450,78 @@ class _AdminErrorCard extends StatelessWidget {
             child: const Text('Retry'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CreateEventFloatingButton extends StatelessWidget {
+  const _CreateEventFloatingButton({
+    required this.onTap,
+  });
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            height: 64,
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            decoration: BoxDecoration(
+              color: AppColors.primaryContainer,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryContainer.withValues(alpha: 0.30),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.20),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.add_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Create New Event',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.1,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

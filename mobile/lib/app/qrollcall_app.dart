@@ -8,7 +8,7 @@ import '../features/admin_dashboard/presentation/screens/admin_dashboard_screen.
 import '../features/auth/data/firebase_auth_service.dart';
 import '../features/auth/presentation/controllers/auth_controller.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
-import '../features/home/presentation/screens/home_screen.dart';
+import '../features/dashboard/presentation/screens/dashboard_screen.dart';
 
 class QRollCallApp extends StatelessWidget {
   const QRollCallApp({super.key});
@@ -56,6 +56,6 @@ class _AuthGate extends StatelessWidget {
       );
     }
 
-    return const HomeScreen();
+    return const DashboardScreen();
   }
 }

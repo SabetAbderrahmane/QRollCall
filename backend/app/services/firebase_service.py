@@ -39,7 +39,10 @@ class FirebaseService:
         self.initialize()
 
         try:
-            return auth.verify_id_token(token)
+            return auth.verify_id_token(
+                token,
+                clock_skew_seconds=10,
+            )
         except Exception as exc:
             raise AuthenticationError(f"Invalid Firebase token: {exc}") from exc
 
