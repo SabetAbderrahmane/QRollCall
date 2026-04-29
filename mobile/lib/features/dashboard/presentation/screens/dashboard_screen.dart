@@ -19,6 +19,9 @@ import 'package:qrollcall_mobile/features/attendance_history/presentation/contro
 import 'package:qrollcall_mobile/features/attendance_history/presentation/screens/attendance_history_screen.dart';
 import 'package:qrollcall_mobile/features/auth/data/firebase_auth_service.dart';
 import 'package:qrollcall_mobile/features/profile/presentation/screens/profile_screen.dart';
+import 'package:qrollcall_mobile/features/notifications/data/notifications_api_service.dart';
+import 'package:qrollcall_mobile/features/notifications/presentation/controllers/notifications_controller.dart';
+import 'package:qrollcall_mobile/features/notifications/presentation/screens/notifications_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -303,8 +306,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  void _handleNotificationsTap() {
-    _showSoonMessage('Notifications page will be added in the next batch.');
+  Future<void> _handleNotificationsTap() async {
+    final result = await Navigator.of(context).push<NotificationExitAction>(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => NotificationsController(
+            apiService: NotificationsApiService(
+              firebaseAuthService: context.read<FirebaseAuthService>(),
+            ),
+          ),
+          child: const NotificationsScreen(),
+        ),
+      ),
+    );
+
+    if (!mounted || result == null) {
+      await context.read<DashboardController>().refreshDashboard();
+      return;
+    }
+
+    await context.read<DashboardController>().refreshDashboard();
+
+    switch (result) {
+      case NotificationExitAction.home:
+        setState(() => _selectedIndex = 0);
+        break;
+
+      case NotificationExitAction.scan:
+        await _handleScanTap();
+        break;
+
+      case NotificationExitAction.history:
+        await _openAttendanceHistory();
+        break;
+
+      case NotificationExitAction.profile:
+        await _openProfile();
+        break;
+    }
   }
 
   void _showSoonMessage(String message) {

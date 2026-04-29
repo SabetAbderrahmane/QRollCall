@@ -4,6 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:qrollcall_mobile/core/theme/app_colors.dart';
 import 'package:qrollcall_mobile/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:qrollcall_mobile/models/app_user.dart';
+import 'package:qrollcall_mobile/features/auth/data/firebase_auth_service.dart';
+import 'package:qrollcall_mobile/features/notifications/data/notifications_api_service.dart';
+import 'package:qrollcall_mobile/features/notifications/presentation/controllers/notifications_controller.dart';
+import 'package:qrollcall_mobile/features/notifications/presentation/screens/notifications_screen.dart';
 
 enum ProfileExitAction {
   home,
@@ -59,10 +63,7 @@ class ProfileScreen extends StatelessWidget {
                       title: 'Notifications',
                       subtitle: 'New announcements will appear here',
                       showDot: true,
-                      onTap: () => _showSoon(
-                        context,
-                        'Notifications page will be added in a later batch.',
-                      ),
+                      onTap: () => _openNotificationsFromProfile(context),
                     ),
                     _ProfileMenuItem(
                       icon: Icons.switch_account_rounded,
@@ -232,6 +233,42 @@ class ProfileScreen extends StatelessWidget {
     if (!context.mounted) return;
 
     Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
+  static Future<void> _openNotificationsFromProfile(BuildContext context) async {
+    final result = await Navigator.of(context).push<NotificationExitAction>(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => NotificationsController(
+            apiService: NotificationsApiService(
+              firebaseAuthService: context.read<FirebaseAuthService>(),
+            ),
+          ),
+          child: const NotificationsScreen(),
+        ),
+      ),
+    );
+
+    if (!context.mounted || result == null) {
+      return;
+    }
+
+    switch (result) {
+      case NotificationExitAction.home:
+        Navigator.of(context).pop(ProfileExitAction.home);
+        break;
+
+      case NotificationExitAction.scan:
+        Navigator.of(context).pop(ProfileExitAction.scan);
+        break;
+
+      case NotificationExitAction.history:
+        Navigator.of(context).pop(ProfileExitAction.history);
+        break;
+
+      case NotificationExitAction.profile:
+        break;
+    }
   }
 
   static String _formatRole(String role) {

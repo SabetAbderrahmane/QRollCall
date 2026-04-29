@@ -11,10 +11,14 @@ import 'package:qrollcall_mobile/features/auth/data/firebase_auth_service.dart';
 import 'package:qrollcall_mobile/features/live_attendance/data/live_attendance_api_service.dart';
 import 'package:qrollcall_mobile/features/live_attendance/presentation/controllers/live_attendance_controller.dart';
 import 'package:qrollcall_mobile/features/live_attendance/presentation/screens/live_attendance_screen.dart';
-import 'package:qrollcall_mobile/features/auth/data/firebase_auth_service.dart';
 import 'package:qrollcall_mobile/features/create_event/data/create_event_api_service.dart';
 import 'package:qrollcall_mobile/features/create_event/presentation/controllers/create_event_controller.dart';
 import 'package:qrollcall_mobile/features/create_event/presentation/screens/create_event_screen.dart';
+import 'package:qrollcall_mobile/features/profile/presentation/screens/profile_screen.dart';
+import 'package:qrollcall_mobile/features/notifications/data/notifications_api_service.dart';
+import 'package:qrollcall_mobile/features/notifications/presentation/controllers/notifications_controller.dart';
+import 'package:qrollcall_mobile/features/notifications/presentation/screens/notifications_screen.dart';
+
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
 
@@ -35,18 +39,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _CreateEventFloatingButton(
-        onTap: _openCreateEvent,
-      ),
+      floatingActionButton: _CreateEventFloatingButton(onTap: _openCreateEvent),
       bottomNavigationBar: _AdminBottomNavBar(
         selectedIndex: _selectedTabIndex,
-        onTap: (index) {
-          setState(() => _selectedTabIndex = index);
-          final labels = ['Dashboard', 'Schedule', 'Activity', 'Settings'];
-          if (index != 0) {
-            _showSoonMessage('${labels[index]} page will be added in the next batch.');
-          }
-        },
+        onTap: _handleAdminBottomTabTap,
       ),
       body: Stack(
         children: [
@@ -64,31 +60,35 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       CircleAvatar(
                         radius: 24,
                         backgroundColor: const Color(0xFF0B2A61),
-                        backgroundImage: (user?.profileImageUrl?.trim().isNotEmpty ?? false)
-                            ? NetworkImage(user!.profileImageUrl!)
-                            : null,
-                        child: (user?.profileImageUrl?.trim().isNotEmpty ?? false)
-                            ? null
-                            : Text(
-                                _initials(user?.fullName ?? 'Admin'),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
+                        backgroundImage:
+                            (user?.profileImageUrl?.trim().isNotEmpty ?? false)
+                                ? NetworkImage(user!.profileImageUrl!)
+                                : null,
+                        child:
+                            (user?.profileImageUrl?.trim().isNotEmpty ?? false)
+                                ? null
+                                : Text(
+                                  _initials(user?.fullName ?? 'Admin'),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
-                              ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
                         child: Text(
                           'Welcome, ${_firstName(user?.fullName ?? 'Admin')}',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w900,
-                              ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.headlineSmall?.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
                       IconButton(
-                        onPressed: () => _showSoonMessage('Notifications panel will be added in the next batch.'),
+                        onPressed: _openAdminNotifications,
                         style: IconButton.styleFrom(
                           backgroundColor: AppColors.surface,
                           side: const BorderSide(color: AppColors.border),
@@ -101,23 +101,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     ],
                   ),
                   const SizedBox(height: 28),
-                  if (adminController.isLoading && !adminController.hasLoadedOnce)
+                  if (adminController.isLoading &&
+                      !adminController.hasLoadedOnce)
                     const Padding(
                       padding: EdgeInsets.only(top: 80),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                      child: Center(child: CircularProgressIndicator()),
                     )
                   else if (adminController.errorMessage != null &&
                       !adminController.hasLoadedOnce)
                     _AdminErrorCard(
                       message: adminController.errorMessage!,
-                      onRetry: () => adminController.loadDashboard(forceRefresh: true),
+                      onRetry:
+                          () =>
+                              adminController.loadDashboard(forceRefresh: true),
                     )
                   else if (adminController.snapshot == null)
                     _AdminErrorCard(
                       message: 'No admin dashboard data is available yet.',
-                      onRetry: () => adminController.loadDashboard(forceRefresh: true),
+                      onRetry:
+                          () =>
+                              adminController.loadDashboard(forceRefresh: true),
                     )
                   else ...[
                     SizedBox(
@@ -127,20 +130,23 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         children: [
                           AdminStatCard(
                             label: 'Total Events Today',
-                            value: '${adminController.snapshot!.totalEventsToday}',
+                            value:
+                                '${adminController.snapshot!.totalEventsToday}',
                             accentColor: AppColors.primaryContainer,
                           ),
                           const SizedBox(width: 14),
                           AdminStatCard(
                             label: 'Students Present Now',
-                            value: '${adminController.snapshot!.studentsPresentNow}',
+                            value:
+                                '${adminController.snapshot!.studentsPresentNow}',
                             accentColor: AppColors.primaryContainer,
                             showPulse: true,
                           ),
                           const SizedBox(width: 14),
                           AdminStatCard(
                             label: 'Pending Manual Checks',
-                            value: '${adminController.snapshot!.pendingManualChecks}',
+                            value:
+                                '${adminController.snapshot!.pendingManualChecks}',
                             accentColor: const Color(0xFFAF52DE),
                             trailingIcon: Icons.pending_actions_rounded,
                           ),
@@ -153,14 +159,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         Expanded(
                           child: Text(
                             'Live & Upcoming Events',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w900,
-                                ),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleLarge?.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                         ),
                         TextButton.icon(
-                          onPressed: () => _showSoonMessage('Schedule page will be added in the next batch.'),
+                          onPressed:
+                              () => _showSoonMessage(
+                                'Schedule page will be added in the next batch.',
+                              ),
                           icon: const Icon(Icons.arrow_forward_rounded),
                           label: const Text('View Schedule'),
                         ),
@@ -170,7 +181,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     if (adminController.snapshot!.liveAndUpcomingEvents.isEmpty)
                       _AdminEmptyBlock(
                         title: 'No live or upcoming events',
-                        subtitle: 'Create an event to start tracking QR attendance from the admin dashboard.',
+                        subtitle:
+                            'Create an event to start tracking QR attendance from the admin dashboard.',
                       )
                     else
                       ...adminController.snapshot!.liveAndUpcomingEvents.map(
@@ -178,16 +190,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           event: event,
                           now: now,
                           onOpenTap: () => _openLiveAttendance(event.id),
-                          onEditTap: () => _showSoonMessage('Event editing will be added in the next batch.'),
+                          onEditTap:
+                              () => _showSoonMessage(
+                                'Event editing will be added in the next batch.',
+                              ),
                         ),
                       ),
                     const SizedBox(height: 16),
                     Text(
                       'Recent Scan Activity',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w900,
-                          ),
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     const SizedBox(height: 14),
                     Container(
@@ -204,22 +219,30 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           ),
                         ],
                       ),
-                      child: adminController.snapshot!.recentActivity.isEmpty
-                          ? _AdminEmptyBlock(
-                              title: 'No scan activity yet',
-                              subtitle: 'Once students begin scanning active event QR codes, recent activity will appear here.',
-                              compact: true,
-                            )
-                          : Column(
-                              children: List.generate(
-                                adminController.snapshot!.recentActivity.length,
-                                (index) => AdminActivityTile(
-                                  activity: adminController.snapshot!.recentActivity[index],
-                                  now: now,
-                                  index: index,
+                      child:
+                          adminController.snapshot!.recentActivity.isEmpty
+                              ? _AdminEmptyBlock(
+                                title: 'No scan activity yet',
+                                subtitle:
+                                    'Once students begin scanning active event QR codes, recent activity will appear here.',
+                                compact: true,
+                              )
+                              : Column(
+                                children: List.generate(
+                                  adminController
+                                      .snapshot!
+                                      .recentActivity
+                                      .length,
+                                  (index) => AdminActivityTile(
+                                    activity:
+                                        adminController
+                                            .snapshot!
+                                            .recentActivity[index],
+                                    now: now,
+                                    index: index,
+                                  ),
                                 ),
                               ),
-                            ),
                     ),
                   ],
                 ],
@@ -232,22 +255,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   void _showSoonMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _openCreateEvent() async {
     final created = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => CreateEventController(
-            apiService: CreateEventApiService(
-              firebaseAuthService: context.read<FirebaseAuthService>(),
+        builder:
+            (_) => ChangeNotifierProvider(
+              create:
+                  (_) => CreateEventController(
+                    apiService: CreateEventApiService(
+                      firebaseAuthService: context.read<FirebaseAuthService>(),
+                    ),
+                  ),
+              child: const CreateEventScreen(),
             ),
-          ),
-          child: const CreateEventScreen(),
-        ),
       ),
     );
 
@@ -260,7 +285,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Event created successfully. Admin dashboard refreshed.'),
+          content: Text(
+            'Event created successfully. Admin dashboard refreshed.',
+          ),
         ),
       );
     }
@@ -269,15 +296,17 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Future<void> _openLiveAttendance(int eventId) async {
     final shouldRefresh = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => LiveAttendanceController(
-            eventId: eventId,
-            apiService: LiveAttendanceApiService(
-              firebaseAuthService: context.read<FirebaseAuthService>(),
+        builder:
+            (_) => ChangeNotifierProvider(
+              create:
+                  (_) => LiveAttendanceController(
+                    eventId: eventId,
+                    apiService: LiveAttendanceApiService(
+                      firebaseAuthService: context.read<FirebaseAuthService>(),
+                    ),
+                  ),
+              child: const LiveAttendanceScreen(),
             ),
-          ),
-          child: const LiveAttendanceScreen(),
-        ),
       ),
     );
 
@@ -288,6 +317,95 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     }
   }
 
+  Future<void> _openAdminNotifications() async {
+    final result = await Navigator.of(context).push<NotificationExitAction>(
+      MaterialPageRoute(
+        builder:
+            (_) => ChangeNotifierProvider(
+              create:
+                  (_) => NotificationsController(
+                    apiService: NotificationsApiService(
+                      firebaseAuthService: context.read<FirebaseAuthService>(),
+                    ),
+                  ),
+              child: const NotificationsScreen(),
+            ),
+      ),
+    );
+
+    if (!mounted || result == null) {
+      await context.read<AdminDashboardController>().refreshDashboard();
+      return;
+    }
+
+    await context.read<AdminDashboardController>().refreshDashboard();
+
+    switch (result) {
+      case NotificationExitAction.home:
+        setState(() => _selectedTabIndex = 0);
+        break;
+
+      case NotificationExitAction.profile:
+        await _openAdminProfile();
+        break;
+
+      case NotificationExitAction.scan:
+        _showSoonMessage(
+          'Admins do not use the student scanner from this dashboard.',
+        );
+        break;
+
+      case NotificationExitAction.history:
+        _showSoonMessage(
+          'Admin activity page will be added in the next batch.',
+        );
+        break;
+    }
+  }
+
+  Future<void> _handleAdminBottomTabTap(int index) async {
+    if (index == 0) {
+      setState(() => _selectedTabIndex = 0);
+      return;
+    }
+
+    if (index == 3) {
+      await _openAdminProfile();
+      return;
+    }
+
+    final labels = ['Dashboard', 'Schedule', 'Activity', 'Profile'];
+    _showSoonMessage('${labels[index]} page will be added in the next batch.');
+  }
+
+  Future<void> _openAdminProfile() async {
+    final result = await Navigator.of(context).push<ProfileExitAction>(
+      MaterialPageRoute(builder: (_) => const ProfileScreen()),
+    );
+
+    if (!mounted || result == null) {
+      return;
+    }
+
+    switch (result) {
+      case ProfileExitAction.home:
+        setState(() => _selectedTabIndex = 0);
+        break;
+
+      case ProfileExitAction.scan:
+        _showSoonMessage(
+          'Admins do not use the student scanner from this dashboard.',
+        );
+        break;
+
+      case ProfileExitAction.history:
+        _showSoonMessage(
+          'Admin activity/history page will be added in the next batch.',
+        );
+        break;
+    }
+  }
+
   static String _firstName(String fullName) {
     final parts = fullName.trim().split(RegExp(r'\s+'));
     if (parts.isEmpty || parts.first.isEmpty) return 'Admin';
@@ -295,11 +413,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   static String _initials(String fullName) {
-    final parts = fullName
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((part) => part.isNotEmpty)
-        .toList();
+    final parts =
+        fullName
+            .trim()
+            .split(RegExp(r'\s+'))
+            .where((part) => part.isNotEmpty)
+            .toList();
 
     if (parts.isEmpty) return 'A';
     if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
@@ -357,10 +476,7 @@ class _AdminBackdrop extends StatelessWidget {
 }
 
 class _AdminBottomNavBar extends StatelessWidget {
-  const _AdminBottomNavBar({
-    required this.selectedIndex,
-    required this.onTap,
-  });
+  const _AdminBottomNavBar({required this.selectedIndex, required this.onTap});
 
   final int selectedIndex;
   final ValueChanged<int> onTap;
@@ -371,7 +487,7 @@ class _AdminBottomNavBar extends StatelessWidget {
       (Icons.grid_view_rounded, 'Dashboard'),
       (Icons.calendar_month_rounded, 'Schedule'),
       (Icons.history_rounded, 'Activity'),
-      (Icons.settings_rounded, 'Settings'),
+      (Icons.person_rounded, 'Profile'),
     ];
 
     return SafeArea(
@@ -407,15 +523,21 @@ class _AdminBottomNavBar extends StatelessWidget {
                   children: [
                     Icon(
                       icon,
-                      color: selected ? AppColors.primaryContainer : AppColors.textSecondary,
+                      color:
+                          selected
+                              ? AppColors.primaryContainer
+                              : AppColors.textSecondary,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       label,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: selected ? AppColors.primaryContainer : AppColors.textSecondary,
-                            fontWeight: FontWeight.w800,
-                          ),
+                        color:
+                            selected
+                                ? AppColors.primaryContainer
+                                : AppColors.textSecondary,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ],
                 ),
@@ -429,10 +551,7 @@ class _AdminBottomNavBar extends StatelessWidget {
 }
 
 class _AdminErrorCard extends StatelessWidget {
-  const _AdminErrorCard({
-    required this.message,
-    required this.onRetry,
-  });
+  const _AdminErrorCard({required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
@@ -453,17 +572,17 @@ class _AdminErrorCard extends StatelessWidget {
           Text(
             'Unable to load admin dashboard',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 10),
           Text(
             message,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
+              color: AppColors.textSecondary,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 18),
           ElevatedButton(
@@ -481,9 +600,7 @@ class _AdminErrorCard extends StatelessWidget {
 }
 
 class _CreateEventFloatingButton extends StatelessWidget {
-  const _CreateEventFloatingButton({
-    required this.onTap,
-  });
+  const _CreateEventFloatingButton({required this.onTap});
 
   final VoidCallback onTap;
 
@@ -502,9 +619,7 @@ class _CreateEventFloatingButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.primaryContainer,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primaryContainer.withValues(alpha: 0.30),
@@ -538,10 +653,10 @@ class _CreateEventFloatingButton extends StatelessWidget {
                 Text(
                   'Create New Event',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.1,
-                      ),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.1,
+                  ),
                 ),
               ],
             ),
@@ -584,18 +699,18 @@ class _AdminEmptyBlock extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             subtitle,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
+              color: AppColors.textSecondary,
+              height: 1.5,
+            ),
           ),
         ],
       ),
