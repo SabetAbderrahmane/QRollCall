@@ -1,5 +1,7 @@
-# backend/app/api/v1/attendance.py
+import asyncio
+import json
 from fastapi import APIRouter, HTTPException, Query, status
+from fastapi.responses import StreamingResponse
 
 from app.api.deps import CurrentUser, DbSession
 from app.core.constants import (
@@ -115,3 +117,29 @@ def get_attendance_stats(
         _raise_attendance_http_error(str(exc))
 
     return AttendanceStatsResponse(**stats)
+
+
+@router.get("/live/{event_id}/stream")
+async def stream_live_attendance(
+    event_id: int,
+    db: DbSession,
+    current_user: CurrentUser,
+):
+    """
+    Experimental SSE endpoint for live attendance updates.
+    Streams the full roster-aware snapshot every 5 seconds.
+    """
+    require_admin(current_user)
+    service = AttendanceService(db)
+
+    async def event_generator():
+        while True:
+            try:
+                snapshot = service.get_live_attendance_snapshot(event_id)
+                yield f"data: {json.dumps(snapshot, default=str)}\n\n"
+            except Exception:
+                # On error, stop the stream
+                break
+            await asyncio.sleep(5)
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")

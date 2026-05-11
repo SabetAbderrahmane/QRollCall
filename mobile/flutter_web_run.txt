@@ -1,0 +1,41 @@
+This application is not configured to build on the web.
+To add web support to a project, run `flutter create .`.
+Launching lib\main.dart on Chrome in debug mode...
+Waiting for connection from debug service on Chrome...             42.8s
+
+Flutter run key commands.
+r Hot reload. 
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "flutter run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+Debug service listening on ws://127.0.0.1:56834/tewcs2gF_4s=/ws
+A Dart VM Service on Chrome is available at: http://127.0.0.1:56834/tewcs2gF_4s=
+The Flutter DevTools debugger and profiler on Chrome is available at: http://127.0.0.1:56834/tewcs2gF_4s=/devtools/?uri=ws://127.0.0.1:56834/tewcs2gF_4s=/ws
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+DartError: Unsupported operation: DefaultFirebaseOptions have not been configured for web - you can reconfigure this by running the FlutterFire CLI again.
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/errors.dart 274:3       throw_
+package:qrollcall_mobile/firebase_options.dart 20:7                               get currentPlatform
+package:qrollcall_mobile/main.dart 18:37                                          <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 542:3                _asyncStartSync
+package:qrollcall_mobile/main.dart 14:14                                          main$
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+web_entrypoint.dart 24:31                                                         <fn>
+lib/ui_web/ui_web/initialization.dart 39:15                                       <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/async/future_impl.dart 804:7                                         <fn>
+dart-sdk/lib/async/schedule_microtask.dart 40:34                                  _microtaskLoop
+dart-sdk/lib/async/schedule_microtask.dart 49:5                                   _startMicrotaskLoop
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 188:69               <fn>

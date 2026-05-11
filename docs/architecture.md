@@ -81,11 +81,20 @@ Hardening in this batch:
 
 ---
 
+## Real-time dashboard
+
+The admin live attendance dashboard uses a polling-based approach:
+- Backend: `get_live_attendance_snapshot` returns a roster-aware JSON snapshot
+- Frontend: `LiveAttendanceController` polls the API every 10 seconds
+- Roster-aware: Snapshot includes all enrolled students as "absent" until they scan correctly
+
+---
+
 ## Future architecture work
 
 Recommended next:
-- WebSocket or SSE support for real-time admin dashboard
+- Native WebSocket support for instantaneous updates
 - real Firebase Cloud Messaging delivery
 - stronger audit logging
 - migration-based schema evolution checks
-- deployment profiles for staging and production
+- deployment profiles for staging and production

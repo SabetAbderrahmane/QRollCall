@@ -27,6 +27,12 @@ class User(BaseModel):
         nullable=False,
         index=True,
     )
+    username: Mapped[str | None] = mapped_column(
+        String(255),
+        unique=True,
+        nullable=True,
+        index=True,
+    )
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[UserRole] = mapped_column(
         SqlEnum(UserRole, name="user_role"),

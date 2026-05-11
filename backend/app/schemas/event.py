@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 class EventBase(BaseModel):
     name: str = Field(..., min_length=2, max_length=255)
     description: Optional[str] = None
+    class_id: Optional[int] = None
 
     start_time: datetime
     end_time: Optional[datetime] = None
@@ -57,6 +58,7 @@ class EventResponse(EventBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    class_id: Optional[int]
     qr_code_token: str
     qr_code_image_path: Optional[str]
     created_by_user_id: int

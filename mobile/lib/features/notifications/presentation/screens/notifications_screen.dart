@@ -553,6 +553,8 @@ class _NotificationTile extends StatelessWidget {
     if (normalized == 'missed_event') return 'Missed';
     if (normalized == 'admin_broadcast') return 'Broadcast';
     if (normalized == 'reminder') return 'Reminder';
+    if (normalized == 'class_invitation') return 'Invitation';
+    if (normalized == 'class_event_reminder') return 'Class Event';
 
     return 'Notice';
   }
@@ -608,6 +610,22 @@ class _NotificationVisuals {
       );
     }
 
+    if (normalized == 'class_invitation') {
+      return const _NotificationVisuals(
+        icon: Icons.mail_outline_rounded,
+        accent: Color(0xFF5AC8FA),
+        background: Color(0xFF0B2A61),
+      );
+    }
+
+    if (normalized == 'class_event_reminder') {
+      return const _NotificationVisuals(
+        icon: Icons.event_available_rounded,
+        accent: Color(0xFFFFD60A),
+        background: Color(0xFF2A2A0A),
+      );
+    }
+
     return const _NotificationVisuals(
       icon: Icons.schedule_rounded,
       accent: AppColors.primaryContainer,
@@ -615,6 +633,7 @@ class _NotificationVisuals {
     );
   }
 }
+
 
 class _TypePill extends StatelessWidget {
   const _TypePill({

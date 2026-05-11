@@ -20,6 +20,8 @@ dependencies:
   geolocator: ^14.0.2
   qr_flutter: ^4.1.0
   share_plus: ^12.0.2
+  matcher: 0.12.19
+
 
 dev_dependencies:
   flutter_test:

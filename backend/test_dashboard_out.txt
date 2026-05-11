@@ -1,0 +1,11 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.3.3, pluggy-1.6.0 -- C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend
+plugins: anyio-4.12.1
+collecting ... collected 2 items
+
+tests/test_live_dashboard.py::test_live_snapshot_standalone_event PASSED [ 50%]
+tests/test_live_dashboard.py::test_live_snapshot_class_linked_event PASSED [100%]
+
+============================== 2 passed in 0.36s ==============================

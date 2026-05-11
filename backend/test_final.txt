@@ -1,0 +1,49 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.3.3, pluggy-1.6.0 -- C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend
+plugins: anyio-4.12.1
+collecting ... collected 40 items
+
+tests/test_attendance.py::test_mark_attendance_success PASSED            [  2%]
+tests/test_attendance.py::test_mark_attendance_duplicate_present_still_conflicts PASSED [  5%]
+tests/test_attendance.py::test_rejected_scan_can_be_retried_and_become_present PASSED [  7%]
+tests/test_attendance.py::test_student_cannot_list_another_users_attendance PASSED [ 10%]
+tests/test_attendance.py::test_attendance_stats_is_admin_only PASSED     [ 12%]
+tests/test_auth.py::test_verify_token_requires_header PASSED             [ 15%]
+tests/test_auth.py::test_sync_user_from_token_success PASSED             [ 17%]
+tests/test_auth.py::test_get_current_user_success PASSED                 [ 20%]
+tests/test_class_reports.py::test_event_summary_absent_count_uses_roster_for_class_event PASSED [ 22%]
+tests/test_class_reports.py::test_event_summary_absent_count_zero_when_all_present PASSED [ 25%]
+tests/test_class_reports.py::test_event_summary_absent_count_fallback_for_standalone_event PASSED [ 27%]
+tests/test_class_reports.py::test_class_roster_report_returns_all_three_statuses PASSED [ 30%]
+tests/test_class_reports.py::test_class_roster_report_non_class_event_returns_400 PASSED [ 32%]
+tests/test_class_reports.py::test_class_roster_report_requires_admin PASSED [ 35%]
+tests/test_events.py::test_create_event PASSED                           [ 37%]
+tests/test_events.py::test_create_event_requires_admin PASSED            [ 40%]
+tests/test_events.py::test_list_events PASSED                            [ 42%]
+tests/test_events.py::test_get_event_not_found PASSED                    [ 45%]
+tests/test_health.py::test_health_check PASSED                           [ 47%]
+tests/test_health.py::test_readiness_check PASSED                        [ 50%]
+tests/test_health.py::test_liveness_check PASSED                         [ 52%]
+tests/test_notifications.py::test_admin_can_create_notification PASSED   [ 55%]
+tests/test_notifications.py::test_user_lists_only_own_notifications PASSED [ 57%]
+tests/test_notifications.py::test_user_cannot_access_another_users_notification PASSED [ 60%]
+tests/test_notifications.py::test_owner_can_mark_notification_read PASSED [ 62%]
+tests/test_qr_security.py::test_mark_attendance_invalid_token_is_rejected PASSED [ 65%]
+tests/test_qr_security.py::test_mark_attendance_inactive_event_is_blocked PASSED [ 67%]
+tests/test_qr_security.py::test_mark_attendance_expired_qr_records_rejected PASSED [ 70%]
+tests/test_qr_security.py::test_mark_attendance_outside_geofence_records_rejected PASSED [ 72%]
+tests/test_qr_security.py::test_mark_attendance_duplicate_present_returns_409 PASSED [ 75%]
+tests/test_qr_security.py::test_mark_attendance_without_auth_returns_401 PASSED [ 77%]
+tests/test_qr_security.py::test_validate_qr_unknown_token_returns_invalid PASSED [ 80%]
+tests/test_qr_security.py::test_validate_qr_outside_time_window_returns_invalid PASSED [ 82%]
+tests/test_qr_validation.py::test_admin_can_generate_qr PASSED           [ 85%]
+tests/test_qr_validation.py::test_student_cannot_generate_qr PASSED      [ 87%]
+tests/test_qr_validation.py::test_authenticated_user_can_validate_qr PASSED [ 90%]
+tests/test_qr_validation.py::test_validate_qr_requires_authentication PASSED [ 92%]
+tests/test_reports.py::test_dashboard_report_is_admin_only PASSED        [ 95%]
+tests/test_reports.py::test_event_report_requires_admin PASSED           [ 97%]
+tests/test_reports.py::test_export_event_report_csv_requires_admin PASSED [100%]
+
+============================= 40 passed in 7.16s ==============================

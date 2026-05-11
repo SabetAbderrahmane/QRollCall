@@ -1,0 +1,37 @@
+
+┌─────────────────────────────────────────────────────────┐
+│ A new version of Flutter is available!                  │
+│                                                         │
+│ To update to the latest version, run "flutter upgrade". │
+└─────────────────────────────────────────────────────────┘
+Analyzing mobile...                                             
+
+warning - The value of the field '_brandBlue' isn't used - lib\features\attendance_history\presentation\screens\attendance_history_screen.dart:19:22 - unused_field
+warning - The value of the field '_textMuted' isn't used - lib\features\attendance_history\presentation\screens\attendance_history_screen.dart:26:22 - unused_field
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:12:15 - unnecessary_null_comparison
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:29:15 - unnecessary_null_comparison
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:46:15 - unnecessary_null_comparison
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:63:15 - unnecessary_null_comparison
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:82:15 - unnecessary_null_comparison
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:97:15 - unnecessary_null_comparison
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:112:15 - unnecessary_null_comparison
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:131:15 - unnecessary_null_comparison
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:148:15 - unnecessary_null_comparison
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\classes\data\classes_api_service.dart:162:15 - unnecessary_null_comparison
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\features\classes\presentation\screens\admin_class_details_screen.dart:56:25 - deprecated_member_use
+   info - 'dialogBackgroundColor' is deprecated and shouldn't be used. Use DialogThemeData.backgroundColor instead. This feature was deprecated after v3.27.0-0.1.pre - lib\features\create_event\presentation\screens\create_event_screen.dart:161:35 - deprecated_member_use
+   info - 'dialogBackgroundColor' is deprecated and shouldn't be used. Use DialogThemeData.backgroundColor instead. This feature was deprecated after v3.27.0-0.1.pre - lib\features\create_event\presentation\screens\create_event_screen.dart:192:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\qr_scanner\presentation\screens\qr_scanner_screen.dart:266:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\qr_scanner\presentation\screens\qr_scanner_screen.dart:302:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\qr_scanner\presentation\screens\qr_scanner_screen.dart:373:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\qr_scanner\presentation\screens\qr_scanner_screen.dart:386:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\qr_scanner\presentation\screens\qr_scanner_screen.dart:418:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\qr_scanner\presentation\screens\qr_scanner_screen.dart:504:27 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\qr_scanner\presentation\screens\qr_scanner_screen.dart:535:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\qr_scanner\presentation\screens\qr_scanner_screen.dart:562:30 - deprecated_member_use
+warning - Unused import: 'dart:math' - lib\features\qr_scanner\presentation\screens\scan_failure_screen.dart:1:8 - unused_import
+   info - 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead - lib\features\qr_scanner\presentation\screens\scan_failure_screen.dart:209:45 - deprecated_member_use
+   info - 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead - lib\features\qr_scanner\presentation\screens\scan_success_screen.dart:201:43 - deprecated_member_use
+   info - 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead - lib\features\qr_scanner\presentation\screens\scan_success_screen.dart:204:43 - deprecated_member_use
+
+27 issues found. (ran in 67.4s)

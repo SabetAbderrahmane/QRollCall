@@ -14,6 +14,7 @@
         "geolocator",
         "google_sign_in",
         "http",
+        "matcher",
         "mobile_scanner",
         "provider",
         "qr_flutter",
@@ -39,6 +40,17 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "matcher",
+      "version": "0.12.19",
+      "dependencies": [
+        "async",
+        "meta",
+        "stack_trace",
+        "term_glyph",
+        "test_api"
       ]
     },
     {
@@ -222,17 +234,6 @@
       "dependencies": []
     },
     {
-      "name": "matcher",
-      "version": "0.12.19",
-      "dependencies": [
-        "async",
-        "meta",
-        "stack_trace",
-        "term_glyph",
-        "test_api"
-      ]
-    },
-    {
       "name": "test_api",
       "version": "0.7.10",
       "dependencies": [
@@ -245,6 +246,19 @@
         "stream_channel",
         "string_scanner",
         "term_glyph"
+      ]
+    },
+    {
+      "name": "term_glyph",
+      "version": "1.2.2",
+      "dependencies": []
+    },
+    {
+      "name": "async",
+      "version": "2.13.1",
+      "dependencies": [
+        "collection",
+        "meta"
       ]
     },
     {
@@ -290,7 +304,7 @@
     },
     {
       "name": "url_launcher_web",
-      "version": "2.4.2",
+      "version": "2.4.3",
       "dependencies": [
         "flutter",
         "flutter_web_plugins",
@@ -507,14 +521,6 @@
       ]
     },
     {
-      "name": "async",
-      "version": "2.13.1",
-      "dependencies": [
-        "collection",
-        "meta"
-      ]
-    },
-    {
       "name": "nested",
       "version": "1.0.0",
       "dependencies": [
@@ -557,11 +563,6 @@
         "path",
         "vm_service"
       ]
-    },
-    {
-      "name": "term_glyph",
-      "version": "1.2.2",
-      "dependencies": []
     },
     {
       "name": "string_scanner",
@@ -677,7 +678,7 @@
     },
     {
       "name": "vm_service",
-      "version": "15.1.0",
+      "version": "15.2.0",
       "dependencies": []
     },
     {

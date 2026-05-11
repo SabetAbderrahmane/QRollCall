@@ -25,6 +25,7 @@ class EventService:
         return self.event_repository.create(
             name=payload.name,
             description=payload.description,
+            class_id=payload.class_id,
             start_time=payload.start_time,
             end_time=payload.end_time,
             location_name=payload.location_name,

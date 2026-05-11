@@ -12,6 +12,8 @@ class NotificationType(str, Enum):
     ATTENDANCE_CONFIRMED = "attendance_confirmed"
     MISSED_EVENT = "missed_event"
     ADMIN_BROADCAST = "admin_broadcast"
+    CLASS_INVITATION = "class_invitation"
+    CLASS_EVENT_REMINDER = "class_event_reminder"
 
 
 class Notification(BaseModel):

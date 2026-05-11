@@ -1,0 +1,51 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.3.3, pluggy-1.6.0 -- C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend
+plugins: anyio-4.12.1
+collecting ... collected 42 items
+
+tests/test_attendance.py::test_mark_attendance_success PASSED            [  2%]
+tests/test_attendance.py::test_mark_attendance_duplicate_present_still_conflicts PASSED [  4%]
+tests/test_attendance.py::test_rejected_scan_can_be_retried_and_become_present PASSED [  7%]
+tests/test_attendance.py::test_student_cannot_list_another_users_attendance PASSED [  9%]
+tests/test_attendance.py::test_attendance_stats_is_admin_only PASSED     [ 11%]
+tests/test_auth.py::test_verify_token_requires_header PASSED             [ 14%]
+tests/test_auth.py::test_sync_user_from_token_success PASSED             [ 16%]
+tests/test_auth.py::test_get_current_user_success PASSED                 [ 19%]
+tests/test_class_reports.py::test_event_summary_absent_count_uses_roster_for_class_event PASSED [ 21%]
+tests/test_class_reports.py::test_event_summary_absent_count_zero_when_all_present PASSED [ 23%]
+tests/test_class_reports.py::test_event_summary_absent_count_fallback_for_standalone_event PASSED [ 26%]
+tests/test_class_reports.py::test_class_roster_report_returns_all_three_statuses PASSED [ 28%]
+tests/test_class_reports.py::test_class_roster_report_non_class_event_returns_400 PASSED [ 30%]
+tests/test_class_reports.py::test_class_roster_report_requires_admin PASSED [ 33%]
+tests/test_events.py::test_create_event PASSED                           [ 35%]
+tests/test_events.py::test_create_event_requires_admin PASSED            [ 38%]
+tests/test_events.py::test_list_events PASSED                            [ 40%]
+tests/test_events.py::test_get_event_not_found PASSED                    [ 42%]
+tests/test_health.py::test_health_check PASSED                           [ 45%]
+tests/test_health.py::test_readiness_check PASSED                        [ 47%]
+tests/test_health.py::test_liveness_check PASSED                         [ 50%]
+tests/test_live_dashboard.py::test_live_snapshot_standalone_event PASSED [ 52%]
+tests/test_live_dashboard.py::test_live_snapshot_class_linked_event PASSED [ 54%]
+tests/test_notifications.py::test_admin_can_create_notification PASSED   [ 57%]
+tests/test_notifications.py::test_user_lists_only_own_notifications PASSED [ 59%]
+tests/test_notifications.py::test_user_cannot_access_another_users_notification PASSED [ 61%]
+tests/test_notifications.py::test_owner_can_mark_notification_read PASSED [ 64%]
+tests/test_qr_security.py::test_mark_attendance_invalid_token_is_rejected PASSED [ 66%]
+tests/test_qr_security.py::test_mark_attendance_inactive_event_is_blocked PASSED [ 69%]
+tests/test_qr_security.py::test_mark_attendance_expired_qr_records_rejected PASSED [ 71%]
+tests/test_qr_security.py::test_mark_attendance_outside_geofence_records_rejected PASSED [ 73%]
+tests/test_qr_security.py::test_mark_attendance_duplicate_present_returns_409 PASSED [ 76%]
+tests/test_qr_security.py::test_mark_attendance_without_auth_returns_401 PASSED [ 78%]
+tests/test_qr_security.py::test_validate_qr_unknown_token_returns_invalid PASSED [ 80%]
+tests/test_qr_security.py::test_validate_qr_outside_time_window_returns_invalid PASSED [ 83%]
+tests/test_qr_validation.py::test_admin_can_generate_qr PASSED           [ 85%]
+tests/test_qr_validation.py::test_student_cannot_generate_qr PASSED      [ 88%]
+tests/test_qr_validation.py::test_authenticated_user_can_validate_qr PASSED [ 90%]
+tests/test_qr_validation.py::test_validate_qr_requires_authentication PASSED [ 92%]
+tests/test_reports.py::test_dashboard_report_is_admin_only PASSED        [ 95%]
+tests/test_reports.py::test_event_report_requires_admin PASSED           [ 97%]
+tests/test_reports.py::test_export_event_report_csv_requires_admin PASSED [100%]
+
+============================= 42 passed in 6.75s ==============================

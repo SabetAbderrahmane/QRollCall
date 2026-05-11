@@ -19,6 +19,10 @@ import 'package:qrollcall_mobile/features/notifications/data/notifications_api_s
 import 'package:qrollcall_mobile/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:qrollcall_mobile/features/notifications/presentation/screens/notifications_screen.dart';
 
+import 'package:qrollcall_mobile/features/classes/data/classes_api_service.dart';
+import 'package:qrollcall_mobile/features/classes/presentation/controllers/admin_classes_controller.dart';
+import 'package:qrollcall_mobile/features/classes/presentation/screens/admin_classes_screen.dart';
+
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
 
@@ -168,12 +172,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           ),
                         ),
                         TextButton.icon(
-                          onPressed:
-                              () => _showSoonMessage(
-                                'Schedule page will be added in the next batch.',
-                              ),
+                          onPressed: () => _openAdminClasses(),
                           icon: const Icon(Icons.arrow_forward_rounded),
-                          label: const Text('View Schedule'),
+                          label: const Text('Manage Classes'),
                         ),
                       ],
                     ),
@@ -369,12 +370,17 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       return;
     }
 
+    if (index == 1) {
+      await _openAdminClasses();
+      return;
+    }
+
     if (index == 3) {
       await _openAdminProfile();
       return;
     }
 
-    final labels = ['Dashboard', 'Schedule', 'Activity', 'Profile'];
+    final labels = ['Dashboard', 'Classes', 'Activity', 'Profile'];
     _showSoonMessage('${labels[index]} page will be added in the next batch.');
   }
 
@@ -394,16 +400,30 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
       case ProfileExitAction.scan:
         _showSoonMessage(
-          'Admins do not use the student scanner from this dashboard.',
+          'Student scanner is not available for administrators.',
         );
         break;
 
       case ProfileExitAction.history:
         _showSoonMessage(
-          'Admin activity/history page will be added in the next batch.',
+          'Detailed activity logs are available in the per-event live view.',
         );
         break;
     }
+  }
+
+
+  Future<void> _openAdminClasses() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => AdminClassesController(
+            apiService: ClassesApiService(firebaseAuthService: context.read<FirebaseAuthService>()),
+          ),
+          child: const AdminClassesScreen(),
+        ),
+      ),
+    );
   }
 
   static String _firstName(String fullName) {
@@ -485,7 +505,7 @@ class _AdminBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     const items = [
       (Icons.grid_view_rounded, 'Dashboard'),
-      (Icons.calendar_month_rounded, 'Schedule'),
+      (Icons.menu_book_rounded, 'Classes'),
       (Icons.history_rounded, 'Activity'),
       (Icons.person_rounded, 'Profile'),
     ];

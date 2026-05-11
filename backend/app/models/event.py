@@ -12,6 +12,12 @@ class Event(BaseModel):
 
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    
+    class_id: Mapped[int | None] = mapped_column(
+        ForeignKey("classes.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
 
     start_time: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -57,6 +63,11 @@ class Event(BaseModel):
         "User",
         back_populates="created_events",
         foreign_keys=[created_by_user_id],
+    )
+
+    class_room = relationship(
+        "ClassRoom",
+        back_populates="events",
     )
 
     attendances = relationship(

@@ -1,0 +1,125 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.3.3, pluggy-1.6.0 -- C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend
+plugins: anyio-4.12.1
+collecting ... collected 40 items
+
+tests/test_attendance.py::test_mark_attendance_success PASSED            [  2%]
+tests/test_attendance.py::test_mark_attendance_duplicate_present_still_conflicts PASSED [  5%]
+tests/test_attendance.py::test_rejected_scan_can_be_retried_and_become_present PASSED [  7%]
+tests/test_attendance.py::test_student_cannot_list_another_users_attendance PASSED [ 10%]
+tests/test_attendance.py::test_attendance_stats_is_admin_only PASSED     [ 12%]
+tests/test_auth.py::test_verify_token_requires_header PASSED             [ 15%]
+tests/test_auth.py::test_sync_user_from_token_success PASSED             [ 17%]
+tests/test_auth.py::test_get_current_user_success PASSED                 [ 20%]
+tests/test_class_reports.py::test_event_summary_absent_count_uses_roster_for_class_event FAILED [ 22%]
+tests/test_class_reports.py::test_event_summary_absent_count_zero_when_all_present PASSED [ 25%]
+tests/test_class_reports.py::test_event_summary_absent_count_fallback_for_standalone_event PASSED [ 27%]
+tests/test_class_reports.py::test_class_roster_report_returns_all_three_statuses PASSED [ 30%]
+tests/test_class_reports.py::test_class_roster_report_non_class_event_returns_400 PASSED [ 32%]
+tests/test_class_reports.py::test_class_roster_report_requires_admin PASSED [ 35%]
+tests/test_events.py::test_create_event PASSED                           [ 37%]
+tests/test_events.py::test_create_event_requires_admin PASSED            [ 40%]
+tests/test_events.py::test_list_events PASSED                            [ 42%]
+tests/test_events.py::test_get_event_not_found PASSED                    [ 45%]
+tests/test_health.py::test_health_check PASSED                           [ 47%]
+tests/test_health.py::test_readiness_check PASSED                        [ 50%]
+tests/test_health.py::test_liveness_check PASSED                         [ 52%]
+tests/test_notifications.py::test_admin_can_create_notification PASSED   [ 55%]
+tests/test_notifications.py::test_user_lists_only_own_notifications PASSED [ 57%]
+tests/test_notifications.py::test_user_cannot_access_another_users_notification PASSED [ 60%]
+tests/test_notifications.py::test_owner_can_mark_notification_read PASSED [ 62%]
+tests/test_qr_security.py::test_mark_attendance_invalid_token_is_rejected FAILED [ 65%]
+tests/test_qr_security.py::test_mark_attendance_inactive_event_is_blocked PASSED [ 67%]
+tests/test_qr_security.py::test_mark_attendance_expired_qr_records_rejected PASSED [ 70%]
+tests/test_qr_security.py::test_mark_attendance_outside_geofence_records_rejected PASSED [ 72%]
+tests/test_qr_security.py::test_mark_attendance_duplicate_present_returns_409 PASSED [ 75%]
+tests/test_qr_security.py::test_mark_attendance_without_auth_returns_401 PASSED [ 77%]
+tests/test_qr_security.py::test_validate_qr_unknown_token_returns_invalid PASSED [ 80%]
+tests/test_qr_security.py::test_validate_qr_outside_time_window_returns_invalid PASSED [ 82%]
+tests/test_qr_validation.py::test_admin_can_generate_qr PASSED           [ 85%]
+tests/test_qr_validation.py::test_student_cannot_generate_qr PASSED      [ 87%]
+tests/test_qr_validation.py::test_authenticated_user_can_validate_qr PASSED [ 90%]
+tests/test_qr_validation.py::test_validate_qr_requires_authentication PASSED [ 92%]
+tests/test_reports.py::test_dashboard_report_is_admin_only PASSED        [ 95%]
+tests/test_reports.py::test_event_report_requires_admin PASSED           [ 97%]
+tests/test_reports.py::test_export_event_report_csv_requires_admin PASSED [100%]
+
+================================== FAILURES ===================================
+_________ test_event_summary_absent_count_uses_roster_for_class_event _________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x0000027AF28380B0>
+
+    def test_event_summary_absent_count_uses_roster_for_class_event(db_session):
+        """
+        For a class-linked event with 3 students enrolled:
+        - 1 present, 1 rejected, 1 unscanned
+        The summary absent_count should be 1 (the unscanned member), NOT 0.
+        """
+        from app.services.report_service import ReportService
+    
+        admin = make_admin(db_session, uid="evs-admin-uid", email="evs_admin@test.com")
+        s1 = make_student(db_session, "evs-s1", "evs_s1@t.com", "Student A")
+        s2 = make_student(db_session, "evs-s2", "evs_s2@t.com", "Student B")
+        s3 = make_student(db_session, "evs-s3", "evs_s3@t.com", "Student C")
+    
+        cls = make_class(db_session, admin.id)
+        for s in [s1, s2, s3]:
+            enroll(db_session, cls.id, s.id)
+    
+        event = make_class_event(db_session, admin.id, cls.id, token="evs-class-tok")
+    
+        # s1 = PRESENT, s2 = REJECTED, s3 = no scan (absent)
+        make_attendance(db_session, event.id, s1.id, AttendanceStatus.PRESENT)
+        make_attendance(db_session, event.id, s2.id, AttendanceStatus.REJECTED)
+    
+        service = ReportService(db_session)
+        summary = service.get_event_summary(event.id)
+    
+        assert summary.present_count == 1
+        assert summary.rejected_count == 1
+>       assert summary.absent_count == 1  # s3 had no scan at all
+E       AssertionError: assert 2 == 1
+E        +  where 2 = EventAttendanceSummary(event_id=1, event_name='Class Attendance Event', start_time=datetime.datetime(2026, 5, 11, 7, 25, 7, 111921), total_records=2, present_count=1, absent_count=2, rejected_count=1, attendance_percentage=33.33).absent_count
+
+tests\test_class_reports.py:161: AssertionError
+_______________ test_mark_attendance_invalid_token_is_rejected ________________
+
+client = <starlette.testclient.TestClient object at 0x0000027AF24B7C50>
+db_session = <sqlalchemy.orm.session.Session object at 0x0000027AF2A740B0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027AF2A756A0>
+
+    def test_mark_attendance_invalid_token_is_rejected(client, db_session, monkeypatch):
+        """An unknown QR token must be rejected with 400."""
+        admin = make_admin(db_session, uid="inv-tok-admin", email="inv_tok_admin@test.com")
+        student = make_student(db_session, uid="inv-tok-student", email="inv_tok_student@test.com")
+    
+        install_auth_mock(monkeypatch, {
+            "inv-tok-bearer": {
+                "uid": student.firebase_uid,
+                "email": student.email,
+                "name": student.full_name,
+            }
+        })
+    
+        response = client.post(
+            "/api/v1/attendance/mark",
+            json={
+                "qr_code_token": "COMPLETELY-INVALID-TOKEN-XXXX",
+                "scan_latitude": 30.549,
+                "scan_longitude": 114.342,
+                "device_id": "sec-device-1",
+            },
+            headers=auth_headers("inv-tok-bearer"),
+        )
+    
+>       assert response.status_code == 400
+E       assert 404 == 400
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests\test_qr_security.py:128: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_class_reports.py::test_event_summary_absent_count_uses_roster_for_class_event
+FAILED tests/test_qr_security.py::test_mark_attendance_invalid_token_is_rejected
+======================== 2 failed, 38 passed in 7.74s =========================

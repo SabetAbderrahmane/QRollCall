@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.3.3, pluggy-1.6.0
+rootdir: C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend
+plugins: anyio-4.12.1
+collected 26 items
+
+tests\test_attendance.py .....                                           [ 19%]
+tests\test_auth.py ...                                                   [ 30%]
+tests\test_events.py ....                                                [ 46%]
+tests\test_health.py ...                                                 [ 57%]
+tests\test_notifications.py ....                                         [ 73%]
+tests\test_qr_validation.py ....                                         [ 88%]
+tests\test_reports.py ...                                                [100%]
+
+============================= 26 passed in 4.06s ==============================

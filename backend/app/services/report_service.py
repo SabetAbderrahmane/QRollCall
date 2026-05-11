@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.constants import REPORT_FORMAT_CSV, REPORT_FORMAT_PDF, SUPPORTED_REPORT_FORMATS
 from app.models.attendance import Attendance, AttendanceStatus
+from app.models.class_membership import ClassMembership, MembershipRole, MembershipStatus
 from app.models.event import Event
 from app.models.user import User
 from app.schemas.report import (
@@ -42,13 +43,6 @@ class ReportService:
             )
         ) or 0
 
-        absent_count = self.db.scalar(
-            select(func.count(Attendance.id)).where(
-                Attendance.event_id == event_id,
-                Attendance.status == AttendanceStatus.ABSENT,
-            )
-        ) or 0
-
         rejected_count = self.db.scalar(
             select(func.count(Attendance.id)).where(
                 Attendance.event_id == event_id,
@@ -56,8 +50,46 @@ class ReportService:
             )
         ) or 0
 
+        # --- Roster-aware absent calculation ---
+        # If the event belongs to a class, absent = active roster members who did not scan PRESENT.
+        # Otherwise fall back to explicit ABSENT records (legacy standalone events).
+        if event.class_id is not None:
+            roster_size = self.db.scalar(
+                select(func.count(ClassMembership.id)).where(
+                    ClassMembership.class_id == event.class_id,
+                    ClassMembership.status == MembershipStatus.ACTIVE,
+                    ClassMembership.role == MembershipRole.STUDENT,
+                )
+            ) or 0
+            # Users who made ANY scan attempt (present or rejected) — they are NOT absent
+            scanned_user_ids = set(
+                self.db.scalars(
+                    select(Attendance.user_id).where(
+                        Attendance.event_id == event_id,
+                    )
+                ).all()
+            )
+            # present users are the subset who actually got PRESENT
+            present_user_ids = set(
+                self.db.scalars(
+                    select(Attendance.user_id).where(
+                        Attendance.event_id == event_id,
+                        Attendance.status == AttendanceStatus.PRESENT,
+                    )
+                ).all()
+            )
+            absent_count = max(roster_size - len(scanned_user_ids), 0)
+        else:
+            absent_count = self.db.scalar(
+                select(func.count(Attendance.id)).where(
+                    Attendance.event_id == event_id,
+                    Attendance.status == AttendanceStatus.ABSENT,
+                )
+            ) or 0
+            roster_size = total_records
+
         attendance_percentage = (
-            (present_count / total_records) * 100 if total_records > 0 else 0.0
+            (present_count / roster_size) * 100 if roster_size > 0 else 0.0
         )
 
         return EventAttendanceSummary(
@@ -70,6 +102,7 @@ class ReportService:
             rejected_count=rejected_count,
             attendance_percentage=round(attendance_percentage, 2),
         )
+
 
     def get_user_summary(self, user_id: int) -> UserAttendanceSummary:
         user = self.db.get(User, user_id)
@@ -99,6 +132,80 @@ class ReportService:
             missed_events=missed_events,
             attendance_percentage=round(attendance_percentage, 2),
         )
+
+    def get_class_event_roster_report(self, event_id: int) -> dict:
+        """
+        Returns a per-student attendance breakdown for a class-linked event.
+
+        Each active class member is reported as:
+          - present   — has an PRESENT attendance record
+          - rejected  — has a REJECTED attendance record (and no PRESENT)
+          - absent    — no attendance record at all
+
+        Only meaningful when event.class_id is not None.
+        """
+        event = self.db.get(Event, event_id)
+        if event is None:
+            raise ValueError("Event not found")
+        if event.class_id is None:
+            raise ValueError("Event is not linked to a class; use the standard event summary instead")
+
+        # Fetch all active student membership rows for the class
+        memberships = self.db.scalars(
+            select(ClassMembership).where(
+                ClassMembership.class_id == event.class_id,
+                ClassMembership.status == MembershipStatus.ACTIVE,
+                ClassMembership.role == MembershipRole.STUDENT,
+            )
+        ).all()
+
+        # Build a lookup: user_id → attendance record
+        attendance_rows = self.db.scalars(
+            select(Attendance).where(Attendance.event_id == event_id)
+        ).all()
+        attendance_by_user: dict[int, Attendance] = {a.user_id: a for a in attendance_rows}
+
+        roster = []
+        for mem in memberships:
+            user = mem.user
+            att = attendance_by_user.get(mem.user_id)
+            if att is None:
+                status = "absent"
+                rejection_reason = None
+                scanned_at = None
+            else:
+                status = att.status.value
+                rejection_reason = att.rejection_reason
+                scanned_at = att.scanned_at
+
+            roster.append({
+                "user_id": user.id,
+                "full_name": user.full_name,
+                "email": user.email,
+                "student_id": user.student_id,
+                "status": status,
+                "rejection_reason": rejection_reason,
+                "scanned_at": scanned_at,
+            })
+
+        present_count = sum(1 for r in roster if r["status"] == "present")
+        absent_count = sum(1 for r in roster if r["status"] == "absent")
+        rejected_count = sum(1 for r in roster if r["status"] == "rejected")
+        roster_size = len(roster)
+
+        return {
+            "event_id": event.id,
+            "event_name": event.name,
+            "class_id": event.class_id,
+            "start_time": event.start_time,
+            "roster_size": roster_size,
+            "present_count": present_count,
+            "absent_count": absent_count,
+            "rejected_count": rejected_count,
+            "attendance_percentage": round((present_count / roster_size * 100) if roster_size > 0 else 0.0, 2),
+            "roster": roster,
+        }
+
 
     def get_dashboard_summary(self) -> DashboardSummaryResponse:
         total_users = self.db.scalar(select(func.count(User.id))) or 0

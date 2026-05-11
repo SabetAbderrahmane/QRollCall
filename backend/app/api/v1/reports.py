@@ -111,3 +111,22 @@ def export_user_report(
         return service.export_user_report(user_id, format)
     except ValueError as exc:
         _raise_report_http_error(str(exc))
+
+
+@router.get("/events/{event_id}/class-roster")
+def get_class_event_roster_report(
+    event_id: int,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> dict:
+    """
+    Returns per-student attendance status (present / absent / rejected) for a
+    class-linked event.  Absent means enrolled active students with no valid scan.
+    """
+    require_admin(current_user)
+    service = ReportService(db)
+
+    try:
+        return service.get_class_event_roster_report(event_id)
+    except ValueError as exc:
+        _raise_report_http_error(str(exc))

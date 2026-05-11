@@ -23,6 +23,10 @@ import 'package:qrollcall_mobile/features/notifications/data/notifications_api_s
 import 'package:qrollcall_mobile/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:qrollcall_mobile/features/notifications/presentation/screens/notifications_screen.dart';
 
+import 'package:qrollcall_mobile/features/classes/data/classes_api_service.dart';
+import 'package:qrollcall_mobile/features/classes/presentation/controllers/student_classes_controller.dart';
+import 'package:qrollcall_mobile/features/classes/presentation/screens/student_classes_screen.dart';
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -130,9 +134,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ],
                                 _UpcomingClassesSection(
                                   events: dashboardController.upcomingEvents,
-                                  onSeeAllTap: () => _showSoonMessage(
-                                    'Classes screen will be built in the next batch.',
-                                  ),
+                                  onSeeAllTap: () => _openClasses(),
                                 ),
                               ],
                             ],
@@ -155,6 +157,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     if (index == 1) {
       await _openAttendanceHistory();
+      return;
+    }
+
+    if (index == 2) {
+      await _openClasses();
       return;
     }
 
@@ -222,6 +229,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
         await _handleScanTap();
         break;
       case AttendanceHistoryExitAction.profile:
+        await _openProfile();
+        break;
+    }
+  }
+
+  Future<void> _openClasses() async {
+    final result = await Navigator.of(context).push<ClassesExitAction>(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => StudentClassesController(
+            apiService: ClassesApiService(
+              firebaseAuthService: context.read<FirebaseAuthService>(),
+            ),
+          ),
+          child: const StudentClassesScreen(),
+        ),
+      ),
+    );
+
+    if (!mounted || result == null) {
+      return;
+    }
+
+    switch (result) {
+      case ClassesExitAction.home:
+        setState(() => _selectedIndex = 0);
+        break;
+      case ClassesExitAction.scan:
+        await _handleScanTap();
+        break;
+      case ClassesExitAction.history:
+        await _openAttendanceHistory();
+        break;
+      case ClassesExitAction.profile:
         await _openProfile();
         break;
     }

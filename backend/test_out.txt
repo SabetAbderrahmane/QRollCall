@@ -1,0 +1,10 @@
+ImportError while loading conftest 'C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend\tests\conftest.py'.
+tests\conftest.py:20: in <module>
+    from app.main import app
+app\main.py:5: in <module>
+    from app.api.router import api_router
+app\api\router.py:12: in <module>
+    from app.api.v1.classes import router as classes_router
+app\api\v1\classes.py:4: in <module>
+    from app.api.deps import get_current_active_user, get_db
+E   ImportError: cannot import name 'get_current_active_user' from 'app.api.deps' (C:\Users\Administrator\Desktop\work\marco\App\qr_attend\backend\app\api\deps.py)

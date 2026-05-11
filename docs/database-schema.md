@@ -6,6 +6,10 @@ The backend currently uses SQLAlchemy models for the main entities:
 - `events`
 - `attendances`
 - `notifications`
+- `classes`
+- `class_memberships`
+- `class_invitations`
+
 
 ---
 
@@ -17,12 +21,14 @@ Stores authenticated system users.
 Key fields:
 - `id` primary key
 - `firebase_uid` unique
+- `username` unique nullable
 - `email` unique
 - `full_name`
 - `role` enum: `admin | student`
 - `is_active`
 - `phone_number`
 - `student_id` unique nullable
+
 - `profile_image_url`
 - `created_at`
 - `updated_at`
@@ -52,9 +58,11 @@ Key fields:
 - `qr_code_image_path`
 - `qr_validity_minutes`
 - `is_active`
+- `class_id` foreign key to `classes.id` nullable
 - `created_by_user_id` foreign key to `users.id`
 - `created_at`
 - `updated_at`
+
 
 Relationships:
 - many-to-one with `users`
@@ -107,7 +115,51 @@ Key fields:
 
 ---
 
-## Security notes
+## classes
+
+Purpose:
+Groups students for centralized course management.
+
+Key fields:
+- `id` primary key
+- `name`
+- `class_code` unique
+- `teacher_user_id` foreign key
+- `description`
+- `location_name`
+- `bounds_latitude_min/max`
+- `bounds_longitude_min/max`
+
+---
+
+## class_memberships
+
+Purpose:
+Links students to classes.
+
+Key fields:
+- `id` primary key
+- `class_id` foreign key
+- `user_id` foreign key
+- `role` (STUDENT | TEACHER)
+- `status` (ACTIVE | INACTIVE)
+
+---
+
+## class_invitations
+
+Purpose:
+Handles formal invitations to join a class.
+
+Key fields:
+- `id` primary key
+- `class_id` foreign key
+- `creator_id` foreign key
+- `invited_user_id` foreign key nullable (if user exists)
+- `invited_email` nullable
+- `invited_username` nullable
+- `status` (PENDING | ACCEPTED | DECLINED | EXPIRED)
+
 - attendance marking must derive `user_id` from the authenticated user
 - event creation must derive `created_by_user_id` from the authenticated admin
 - route-level authorization determines which records each user can access

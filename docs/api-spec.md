@@ -10,7 +10,8 @@ Most protected endpoints require:
 
 Authentication and authorization rules:
 - Student/participant users can mark their own attendance and view their own attendance/notifications.
-- Admin users can manage events, generate QR codes, access reports, and create notifications.
+- Admin users can manage events, generate QR codes, access reports, create notifications, and manage classes.
+
 
 ---
 
@@ -79,6 +80,10 @@ Admin only.
 ### `DELETE /api/v1/users/{user_id}`
 Admin only.
 
+### `GET /api/v1/users/search?q=...`
+Admin only. Search by username or email.
+
+
 ---
 
 ## Events
@@ -144,6 +149,42 @@ Validation checks:
 - event exists
 - scan is inside allowed time window
 - scan is inside event geofence
+- student is enrolled if class-linked
+
+---
+
+## Classes
+
+### `POST /api/v1/classes`
+Admin only. Create a new class/course.
+
+### `GET /api/v1/classes/my`
+Student only. List classes the student has joined.
+
+### `GET /api/v1/classes/created`
+Admin only. List classes created by the admin.
+
+### `GET /api/v1/classes/{class_id}`
+Authenticated users. Get class details.
+
+### `GET /api/v1/classes/{class_id}/students`
+Teacher or Admin. List class roster.
+
+### `POST /api/v1/classes/{class_id}/invite`
+Teacher or Admin. Invite student by email or username.
+
+### `GET /api/v1/classes/{class_id}/invitations`
+Teacher or Admin. List invitations for a class.
+
+### `GET /api/v1/classes/me/invitations`
+Student only. List pending invitations for the student.
+
+### `POST /api/v1/classes/invitations/{invitation_id}/accept`
+Student only. Accept a class invitation.
+
+### `POST /api/v1/classes/invitations/{invitation_id}/decline`
+Student only. Decline a class invitation.
+
 
 ---
 
@@ -181,6 +222,9 @@ Admin only.
 ### `GET /api/v1/reports/users/{user_id}`
 Admin only.
 
+### `GET /api/v1/reports/events/{event_id}/class-roster`
+Admin/Teacher only. Roster-aware breakdown (Present/Absent/Rejected) for a class event.
+
 ### `POST /api/v1/reports/export`
 Admin only.
 
@@ -188,4 +232,4 @@ Admin only.
 Admin only.
 
 ### `GET /api/v1/reports/export/user/{user_id}?format=csv|pdf`
-Admin only.
+Admin only.

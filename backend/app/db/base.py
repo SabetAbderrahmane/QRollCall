@@ -8,6 +8,9 @@ def import_all_models() -> None:
     import app.models.event  # noqa: F401
     import app.models.notification  # noqa: F401
     import app.models.user  # noqa: F401
+    import app.models.class_room  # noqa: F401
+    import app.models.class_membership  # noqa: F401
+    import app.models.class_invitation  # noqa: F401
 
 
 def create_tables() -> None:

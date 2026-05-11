@@ -9,6 +9,7 @@ from app.api.v1.notifications import router as notifications_router
 from app.api.v1.qr import router as qr_router
 from app.api.v1.reports import router as reports_router
 from app.api.v1.users import router as users_router
+from app.api.v1.classes import router as classes_router
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -23,3 +24,4 @@ api_router.include_router(attendance_router)
 api_router.include_router(qr_router)
 api_router.include_router(notifications_router)
 api_router.include_router(reports_router)
+api_router.include_router(classes_router)

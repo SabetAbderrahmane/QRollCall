@@ -116,43 +116,89 @@ class AttendanceService:
         if event is None:
             raise ValueError(ERROR_EVENT_NOT_FOUND)
 
-        items, _ = self.attendance_repository.list(
+        # Get all attendance records for this event
+        attendance_records, _ = self.attendance_repository.list(
             skip=0,
-            limit=200,
+            limit=500,  # Increased limit for live dashboard
             event_id=event_id,
         )
-        stats = self.attendance_repository.stats_by_event(event_id)
-
+        # Map attendance records by user_id
+        attendance_by_user = {a.user_id: a for a in attendance_records}
+        
         students = []
-
-        for attendance in items:
-            user = attendance.user
-
-            if hasattr(attendance.status, "value"):
-                status_value = attendance.status.value
-            else:
-                status_value = str(attendance.status)
-
-            device_id = attendance.device_id
-            entry_method = "In-app QR"
-            if device_id is None or str(device_id).strip() == "":
-                entry_method = "Manual Entry"
-
-            students.append(
-                {
+        
+        # Determine the set of users to show
+        if event.class_id is not None:
+            # If class-linked, show all active students in the roster
+            from app.models.class_membership import ClassMembership, MembershipRole, MembershipStatus
+            from sqlalchemy import select
+            
+            roster_members = self.db.scalars(
+                select(ClassMembership).where(
+                    ClassMembership.class_id == event.class_id,
+                    ClassMembership.status == MembershipStatus.ACTIVE,
+                    ClassMembership.role == MembershipRole.STUDENT
+                )
+            ).all()
+            
+            for membership in roster_members:
+                user = membership.user
+                attendance = attendance_by_user.get(user.id)
+                
+                if attendance:
+                    status = attendance.status.value if hasattr(attendance.status, "value") else str(attendance.status)
+                    scanned_at = attendance.scanned_at
+                    entry_method = "In-app QR" if attendance.device_id else "Manual Entry"
+                    attendance_id = attendance.id
+                    device_id = attendance.device_id
+                    rejection_reason = attendance.rejection_reason
+                else:
+                    status = "absent"
+                    scanned_at = event.start_time # Use start time as placeholder
+                    entry_method = "N/A"
+                    attendance_id = 0 # Dummy ID for absent students
+                    device_id = None
+                    rejection_reason = None
+                
+                students.append({
+                    "attendance_id": attendance_id,
+                    "user_id": user.id,
+                    "full_name": user.full_name,
+                    "email": user.email,
+                    "student_id": user.student_id,
+                    "profile_image_url": user.profile_image_url,
+                    "status": status,
+                    "scanned_at": scanned_at,
+                    "entry_method": entry_method,
+                    "device_id": device_id,
+                    "rejection_reason": rejection_reason,
+                })
+        else:
+            # Standalone event: only show people who scanned
+            for attendance in attendance_records:
+                user = attendance.user
+                status = attendance.status.value if hasattr(attendance.status, "value") else str(attendance.status)
+                entry_method = "In-app QR" if attendance.device_id else "Manual Entry"
+                
+                students.append({
                     "attendance_id": attendance.id,
                     "user_id": user.id,
                     "full_name": user.full_name,
                     "email": user.email,
                     "student_id": user.student_id,
                     "profile_image_url": user.profile_image_url,
-                    "status": status_value,
+                    "status": status,
                     "scanned_at": attendance.scanned_at,
                     "entry_method": entry_method,
-                    "device_id": device_id,
+                    "device_id": attendance.device_id,
                     "rejection_reason": attendance.rejection_reason,
-                }
-            )
+                })
+
+        # Calculate counts
+        present_count = sum(1 for s in students if s["status"] == "present")
+        rejected_count = sum(1 for s in students if s["status"] == "rejected")
+        absent_count = sum(1 for s in students if s["status"] == "absent")
+        total_records = len(students)
 
         return {
             "event_id": event.id,
@@ -161,12 +207,13 @@ class AttendanceService:
             "start_time": event.start_time,
             "end_time": event.end_time,
             "is_active": event.is_active,
-            "total_records": stats["total_records"],
-            "present_count": stats["present_count"],
-            "absent_count": stats["absent_count"],
-            "rejected_count": stats["rejected_count"],
+            "total_records": total_records,
+            "present_count": present_count,
+            "absent_count": absent_count,
+            "rejected_count": rejected_count,
             "students": students,
         }
+
 
     def update_attendance(self, attendance: Attendance, **kwargs) -> Attendance:
         return self.attendance_repository.update(attendance, **kwargs)
