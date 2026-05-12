@@ -191,10 +191,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           event: event,
                           now: now,
                           onOpenTap: () => _openLiveAttendance(event.id),
-                          onEditTap:
-                              () => _showSoonMessage(
-                                'Event editing will be added in the next batch.',
-                              ),
                         ),
                       ),
                     const SizedBox(height: 16),
@@ -253,12 +249,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         ],
       ),
     );
-  }
-
-  void _showSoonMessage(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _openCreateEvent() async {
@@ -351,15 +341,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         break;
 
       case NotificationExitAction.scan:
-        _showSoonMessage(
-          'Admins do not use the student scanner from this dashboard.',
-        );
         break;
 
       case NotificationExitAction.history:
-        _showSoonMessage(
-          'Admin activity page will be added in the next batch.',
-        );
         break;
     }
   }
@@ -375,13 +359,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       return;
     }
 
-    if (index == 3) {
+    if (index == 2) {
       await _openAdminProfile();
       return;
     }
-
-    final labels = ['Dashboard', 'Classes', 'Activity', 'Profile'];
-    _showSoonMessage('${labels[index]} page will be added in the next batch.');
   }
 
   Future<void> _openAdminProfile() async {
@@ -399,29 +380,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         break;
 
       case ProfileExitAction.scan:
-        _showSoonMessage(
-          'Student scanner is not available for administrators.',
-        );
         break;
 
       case ProfileExitAction.history:
-        _showSoonMessage(
-          'Detailed activity logs are available in the per-event live view.',
-        );
         break;
     }
   }
 
-
   Future<void> _openAdminClasses() async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => AdminClassesController(
-            apiService: ClassesApiService(firebaseAuthService: context.read<FirebaseAuthService>()),
-          ),
-          child: const AdminClassesScreen(),
-        ),
+        builder:
+            (_) => ChangeNotifierProvider(
+              create:
+                  (_) => AdminClassesController(
+                    apiService: ClassesApiService(
+                      firebaseAuthService: context.read<FirebaseAuthService>(),
+                    ),
+                  ),
+              child: const AdminClassesScreen(),
+            ),
       ),
     );
   }
@@ -506,7 +484,6 @@ class _AdminBottomNavBar extends StatelessWidget {
     const items = [
       (Icons.grid_view_rounded, 'Dashboard'),
       (Icons.menu_book_rounded, 'Classes'),
-      (Icons.history_rounded, 'Activity'),
       (Icons.person_rounded, 'Profile'),
     ];
 

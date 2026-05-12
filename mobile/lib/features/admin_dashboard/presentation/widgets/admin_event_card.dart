@@ -42,10 +42,7 @@ class AdminEventCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _EventBadge(
-                label: event.badgeLabel(now),
-                isLive: isLive,
-              ),
+              _EventBadge(label: event.badgeLabel(now), isLive: isLive),
               const Spacer(),
               Container(
                 width: 46,
@@ -55,7 +52,9 @@ class AdminEventCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
-                  isLive ? Icons.qr_code_scanner_rounded : Icons.more_vert_rounded,
+                  isLive
+                      ? Icons.qr_code_scanner_rounded
+                      : Icons.more_vert_rounded,
                   color: AppColors.primaryContainer,
                 ),
               ),
@@ -65,17 +64,17 @@ class AdminEventCard extends StatelessWidget {
           Text(
             event.name,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
             event.subtitle(now),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.45,
-                ),
+              color: AppColors.textSecondary,
+              height: 1.45,
+            ),
           ),
           const SizedBox(height: 20),
           Row(
@@ -83,9 +82,9 @@ class AdminEventCard extends StatelessWidget {
               Text(
                 'Student Attendance',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const Spacer(),
               RichText(
@@ -141,22 +140,24 @@ class AdminEventCard extends StatelessWidget {
                   label: const Text('Live Tracker'),
                 ),
               ),
-              const SizedBox(width: 12),
-              SizedBox(
-                height: 48,
-                child: OutlinedButton(
-                  onPressed: onEditTap,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textPrimary,
-                    backgroundColor: const Color(0xFF18233B),
-                    side: const BorderSide(color: AppColors.border),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+              if (onEditTap != null) ...[
+                const SizedBox(width: 12),
+                SizedBox(
+                  height: 48,
+                  child: OutlinedButton(
+                    onPressed: onEditTap,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      backgroundColor: const Color(0xFF18233B),
+                      side: const BorderSide(color: AppColors.border),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
                     ),
+                    child: const Icon(Icons.edit_rounded, size: 19),
                   ),
-                  child: const Icon(Icons.edit_rounded, size: 19),
                 ),
-              ),
+              ],
             ],
           ),
         ],
@@ -166,10 +167,7 @@ class AdminEventCard extends StatelessWidget {
 }
 
 class _EventBadge extends StatelessWidget {
-  const _EventBadge({
-    required this.label,
-    required this.isLive,
-  });
+  const _EventBadge({required this.label, required this.isLive});
 
   final String label;
   final bool isLive;
@@ -199,10 +197,10 @@ class _EventBadge extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: isLive ? const Color(0xFF57D26C) : AppColors.textSecondary,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.0,
-                ),
+              color: isLive ? const Color(0xFF57D26C) : AppColors.textSecondary,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.0,
+            ),
           ),
         ],
       ),

@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:qrollcall_mobile/features/qr_scanner/models/scan_result_models.dart';
 
 class ScanSuccessScreen extends StatefulWidget {
-  const ScanSuccessScreen({
-    super.key,
-    required this.data,
-  });
+  const ScanSuccessScreen({super.key, required this.data});
 
   final ScanSuccessViewData data;
 
@@ -121,6 +118,13 @@ class _ScanSuccessScreenState extends State<ScanSuccessScreen>
           final iconScale = _iconScale.value.clamp(0.001, 1.0);
           final rotateX = (1 - iconScale) * 0.8;
           final rotateY = (1 - iconScale) * -0.35;
+          final screenHeight = MediaQuery.of(context).size.height;
+          final dense = screenHeight < 680;
+          final compact = screenHeight < 760;
+          final heroSize = dense ? 158.0 : (compact ? 200.0 : 260.0);
+          final iconSize = dense ? 88.0 : (compact ? 110.0 : 134.0);
+          final cardPadding = dense ? 14.0 : (compact ? 16.0 : 22.0);
+          final buttonHeight = dense ? 48.0 : (compact ? 52.0 : 62.0);
 
           return Container(
             decoration: BoxDecoration(
@@ -141,303 +145,124 @@ class _ScanSuccessScreenState extends State<ScanSuccessScreen>
                   ),
                 ),
                 SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      dense ? 12 : 18,
+                      20,
+                      dense ? 18 : 24,
+                    ),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const _ResultTopBar(),
-                        const SizedBox(height: 12),
-                        Expanded(
-                          child: Column(
+                        SizedBox(height: dense ? 6 : (compact ? 10 : 18)),
+                        SizedBox(
+                          width: heroSize,
+                          height: heroSize,
+                          child: Stack(
+                            alignment: Alignment.center,
                             children: [
-                              const Spacer(flex: 2),
-                              SizedBox(
-                                width: 280,
-                                height: 280,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Transform.scale(
-                                      scale: 0.65 + (_ringExpand.value * 0.95),
-                                      child: Container(
-                                        width: 230,
-                                        height: 230,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: const Color(0xFF57E684).withValues(
-                                              alpha: 0.15 + (wash * 0.35),
-                                            ),
-                                            width: 3,
-                                          ),
-                                        ),
-                                      ),
+                              Transform.scale(
+                                scale: 0.65 + (_ringExpand.value * 0.95),
+                                child: Container(
+                                  width: heroSize * 0.82,
+                                  height: heroSize * 0.82,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: const Color(
+                                        0xFF57E684,
+                                      ).withValues(alpha: 0.15 + (wash * 0.35)),
+                                      width: 3,
                                     ),
-                                    Transform.scale(
-                                      scale: 0.78 + (_ringExpand.value * 0.45),
-                                      child: Container(
-                                        width: 260,
-                                        height: 260,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          gradient: RadialGradient(
-                                            colors: [
-                                              const Color(0xFF57E684).withValues(
-                                                alpha: 0.16 + (wash * 0.28),
-                                              ),
-                                              const Color(0xFF57E684).withValues(
-                                                alpha: 0.05 + (wash * 0.16),
-                                              ),
-                                              Colors.transparent,
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Transform(
-                                      alignment: Alignment.center,
-                                      transform: Matrix4.identity()
-                                        ..setEntry(3, 2, 0.0012)
-                                        ..translate(0.0, _iconLift.value)
-                                        ..rotateX(rotateX)
-                                        ..rotateY(rotateY)
-                                        ..scale(iconScale),
-                                      child: Container(
-                                        width: 134,
-                                        height: 134,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(42),
-                                          gradient: const LinearGradient(
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                            colors: [
-                                              Color(0xFF65E18A),
-                                              Color(0xFF37C75F),
-                                              Color(0xFF189E40),
-                                            ],
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: const Color(0xFF45E06E).withValues(
-                                                alpha: 0.34,
-                                              ),
-                                              blurRadius: 38,
-                                              spreadRadius: 3,
-                                              offset: const Offset(0, 18),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            Positioned.fill(
-                                              child: DecoratedBox(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(42),
-                                                  gradient: LinearGradient(
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomCenter,
-                                                    colors: [
-                                                      Colors.white.withValues(alpha: 0.18),
-                                                      Colors.transparent,
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const Center(
-                                              child: Icon(
-                                                Icons.check_rounded,
-                                                size: 76,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Opacity(
-                                opacity: _contentFade.value,
-                                child: Transform.translate(
-                                  offset: Offset(0, 20 * (1 - _contentFade.value)),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Attendance Marked\nSuccessfully!',
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headlineMedium
-                                            ?.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w900,
-                                              height: 1.05,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 14),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 18,
-                                          vertical: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF0E2A18),
-                                          borderRadius: BorderRadius.circular(999),
-                                        ),
-                                        child: Text(
-                                          widget.data.statusLabel,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelLarge
-                                              ?.copyWith(
-                                                color: const Color(0xFF41D36A),
-                                                fontWeight: FontWeight.w900,
-                                                letterSpacing: 0.7,
-                                              ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 26),
-                                      Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.all(22),
-                                        decoration: BoxDecoration(
-                                          color: _cardColor,
-                                          borderRadius: BorderRadius.circular(30),
-                                          border: Border.all(
-                                            color: Colors.white.withValues(alpha: 0.06),
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.22),
-                                              blurRadius: 20,
-                                              spreadRadius: 1,
-                                              offset: const Offset(0, 12),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Event Details',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .labelMedium
-                                                  ?.copyWith(
-                                                    color: const Color(0xFF6E7FA6),
-                                                    fontWeight: FontWeight.w800,
-                                                    letterSpacing: 1.3,
-                                                  ),
-                                            ),
-                                            const SizedBox(height: 12),
-                                            Text(
-                                              widget.data.eventName,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge
-                                                  ?.copyWith(
-                                                    color: _brandBlue,
-                                                    fontWeight: FontWeight.w800,
-                                                  ),
-                                            ),
-                                            const SizedBox(height: 18),
-                                            Divider(
-                                              height: 1,
-                                              color:
-                                                  Colors.white.withValues(alpha: 0.06),
-                                            ),
-                                            const SizedBox(height: 18),
-                                            Row(
-                                              children: [
-                                                const _DetailIcon(
-                                                  icon: Icons.access_time_rounded,
-                                                ),
-                                                const SizedBox(width: 14),
-                                                Expanded(
-                                                  child: _DetailTextBlock(
-                                                    label: 'Timestamp',
-                                                    value: verifiedAtLabel,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 16),
-                                            Row(
-                                              children: [
-                                                const _DetailIcon(
-                                                  icon: Icons.location_on_outlined,
-                                                ),
-                                                const SizedBox(width: 14),
-                                                Expanded(
-                                                  child: _DetailTextBlock(
-                                                    label: 'Location Check',
-                                                    value: widget.data.locationLabel,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ),
                               ),
-                              const Spacer(flex: 2),
-                              Opacity(
-                                opacity: _actionsFade.value,
-                                child: Transform.translate(
-                                  offset: Offset(0, 20 * (1 - _actionsFade.value)),
-                                  child: Column(
+                              Transform.scale(
+                                scale: 0.78 + (_ringExpand.value * 0.45),
+                                child: Container(
+                                  width: heroSize * 0.94,
+                                  height: heroSize * 0.94,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        const Color(0xFF57E684).withValues(
+                                          alpha: 0.16 + (wash * 0.28),
+                                        ),
+                                        const Color(0xFF57E684).withValues(
+                                          alpha: 0.05 + (wash * 0.16),
+                                        ),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Transform(
+                                alignment: Alignment.center,
+                                transform:
+                                    Matrix4.identity()
+                                      ..setEntry(3, 2, 0.0012)
+                                      ..translate(0.0, _iconLift.value)
+                                      ..rotateX(rotateX)
+                                      ..rotateY(rotateY)
+                                      ..scale(iconScale),
+                                child: Container(
+                                  width: iconSize,
+                                  height: iconSize,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                      compact ? 34 : 42,
+                                    ),
+                                    gradient: const LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color(0xFF65E18A),
+                                        Color(0xFF37C75F),
+                                        Color(0xFF189E40),
+                                      ],
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFF45E06E,
+                                        ).withValues(alpha: 0.34),
+                                        blurRadius: 38,
+                                        spreadRadius: 3,
+                                        offset: const Offset(0, 18),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Stack(
                                     children: [
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(ScanFlowExitAction.done);
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF1A7B23),
-                                            foregroundColor: Colors.white,
-                                            minimumSize:
-                                                const Size.fromHeight(62),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(22),
+                                      Positioned.fill(
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              compact ? 34 : 42,
+                                            ),
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [
+                                                Colors.white.withValues(
+                                                  alpha: 0.18,
+                                                ),
+                                                Colors.transparent,
+                                              ],
                                             ),
                                           ),
-                                          child: const Text('Done'),
                                         ),
                                       ),
-                                      const SizedBox(height: 14),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: OutlinedButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop(
-                                              ScanFlowExitAction.openHistory,
-                                            );
-                                          },
-                                          style: OutlinedButton.styleFrom(
-                                            foregroundColor: Colors.white,
-                                            minimumSize:
-                                                const Size.fromHeight(58),
-                                            side: BorderSide(
-                                              color: Colors.white.withValues(alpha: 0.10),
-                                            ),
-                                            backgroundColor: const Color(0xFF07183A),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(22),
-                                            ),
-                                          ),
-                                          child: const Text('View My History'),
+                                      Center(
+                                        child: Icon(
+                                          Icons.check_rounded,
+                                          size: compact ? 62 : 76,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ],
@@ -445,6 +270,215 @@ class _ScanSuccessScreenState extends State<ScanSuccessScreen>
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                        SizedBox(height: dense ? 4 : (compact ? 6 : 8)),
+                        Opacity(
+                          opacity: _contentFade.value,
+                          child: Transform.translate(
+                            offset: Offset(0, 20 * (1 - _contentFade.value)),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Attendance Marked\nSuccessfully!',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineMedium?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    height: 1.05,
+                                    fontSize:
+                                        dense ? 22 : (compact ? 25 : null),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: dense ? 8 : (compact ? 10 : 14),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0E2A18),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    widget.data.statusLabel,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.labelLarge?.copyWith(
+                                      color: const Color(0xFF41D36A),
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.7,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: dense ? 12 : (compact ? 16 : 26),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(cardPadding),
+                                  decoration: BoxDecoration(
+                                    color: _cardColor,
+                                    borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.06,
+                                      ),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.22,
+                                        ),
+                                        blurRadius: 20,
+                                        spreadRadius: 1,
+                                        offset: const Offset(0, 12),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Event Details',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.labelMedium?.copyWith(
+                                          color: const Color(0xFF6E7FA6),
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 1.3,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            dense ? 8 : (compact ? 8 : 12),
+                                      ),
+                                      Text(
+                                        widget.data.eventName,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleLarge?.copyWith(
+                                          color: _brandBlue,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            dense ? 10 : (compact ? 12 : 18),
+                                      ),
+                                      Divider(
+                                        height: 1,
+                                        color: Colors.white.withValues(
+                                          alpha: 0.06,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            dense ? 10 : (compact ? 12 : 18),
+                                      ),
+                                      Row(
+                                        children: [
+                                          const _DetailIcon(
+                                            icon: Icons.access_time_rounded,
+                                          ),
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: _DetailTextBlock(
+                                              label: 'Timestamp',
+                                              value: verifiedAtLabel,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            dense ? 10 : (compact ? 12 : 16),
+                                      ),
+                                      Row(
+                                        children: [
+                                          const _DetailIcon(
+                                            icon: Icons.location_on_outlined,
+                                          ),
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: _DetailTextBlock(
+                                              label: 'Location Check',
+                                              value: widget.data.locationLabel,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: dense ? 14 : (compact ? 18 : 26)),
+                        Opacity(
+                          opacity: _actionsFade.value,
+                          child: Transform.translate(
+                            offset: Offset(0, 20 * (1 - _actionsFade.value)),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(
+                                        context,
+                                      ).pop(ScanFlowExitAction.done);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF1A7B23),
+                                      foregroundColor: Colors.white,
+                                      minimumSize: Size.fromHeight(
+                                        buttonHeight,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(22),
+                                      ),
+                                    ),
+                                    child: const Text('Done'),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: dense ? 8 : (compact ? 10 : 14),
+                                ),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      Navigator.of(
+                                        context,
+                                      ).pop(ScanFlowExitAction.openHistory);
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      minimumSize: Size.fromHeight(
+                                        dense ? 48 : (compact ? 52 : 58),
+                                      ),
+                                      side: BorderSide(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.10,
+                                        ),
+                                      ),
+                                      backgroundColor: const Color(0xFF07183A),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(22),
+                                      ),
+                                    ),
+                                    child: const Text('View My History'),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -460,9 +494,10 @@ class _ScanSuccessScreenState extends State<ScanSuccessScreen>
   }
 
   static String _formatDateTime(DateTime value) {
-    final hour = value.hour == 0
-        ? 12
-        : value.hour > 12
+    final hour =
+        value.hour == 0
+            ? 12
+            : value.hour > 12
             ? value.hour - 12
             : value.hour;
     final minute = value.minute.toString().padLeft(2, '0');
@@ -473,10 +508,7 @@ class _ScanSuccessScreenState extends State<ScanSuccessScreen>
 }
 
 class _SuccessBackdrop extends StatelessWidget {
-  const _SuccessBackdrop({
-    required this.wash,
-    required this.sparkleValue,
-  });
+  const _SuccessBackdrop({required this.wash, required this.sparkleValue});
 
   final double wash;
   final double sparkleValue;
@@ -537,8 +569,8 @@ class _SuccessBackdrop extends StatelessWidget {
         ),
         ...List.generate(10, (index) {
           final angle = (index / 10) * math.pi * 2;
-          final radius = 150 +
-              (16 * math.sin((sparkleValue * math.pi * 2) + index));
+          final radius =
+              150 + (16 * math.sin((sparkleValue * math.pi * 2) + index));
           final dx = math.cos(angle) * radius;
           final dy = math.sin(angle) * radius;
           final size = index.isEven ? 7.0 : 5.0;
@@ -575,9 +607,9 @@ class _ResultTopBar extends StatelessWidget {
         Text(
           'QRollCall',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: _ScanSuccessScreenState._brandBlue,
-                fontWeight: FontWeight.w900,
-              ),
+            color: _ScanSuccessScreenState._brandBlue,
+            fontWeight: FontWeight.w900,
+          ),
         ),
       ],
     );
@@ -598,19 +630,13 @@ class _DetailIcon extends StatelessWidget {
         color: _ScanSuccessScreenState._cardIconBg,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Icon(
-        icon,
-        color: _ScanSuccessScreenState._brandBlue,
-      ),
+      child: Icon(icon, color: _ScanSuccessScreenState._brandBlue),
     );
   }
 }
 
 class _DetailTextBlock extends StatelessWidget {
-  const _DetailTextBlock({
-    required this.label,
-    required this.value,
-  });
+  const _DetailTextBlock({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -623,18 +649,18 @@ class _DetailTextBlock extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: const Color(0xFF6E7FA6),
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.2,
-              ),
+            color: const Color(0xFF6E7FA6),
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.2,
+          ),
         ),
         const SizedBox(height: 6),
         Text(
           value,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ],
     );

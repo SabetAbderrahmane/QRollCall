@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,8 +10,6 @@ import 'package:qrollcall_mobile/features/qr_scanner/data/qr_scanner_api_service
 import 'package:qrollcall_mobile/features/qr_scanner/models/scan_result_models.dart';
 import 'package:qrollcall_mobile/features/qr_scanner/presentation/controllers/qr_scanner_controller.dart';
 import 'package:qrollcall_mobile/features/qr_scanner/presentation/screens/qr_scanner_screen.dart';
-import 'package:qrollcall_mobile/features/qr_scanner/presentation/screens/scan_failure_screen.dart';
-import 'package:qrollcall_mobile/features/qr_scanner/presentation/screens/scan_success_screen.dart';
 import 'package:qrollcall_mobile/models/event_item.dart';
 import 'package:qrollcall_mobile/features/attendance_history/data/attendance_history_api_service.dart';
 import 'package:qrollcall_mobile/features/attendance_history/presentation/controllers/attendance_history_controller.dart';
@@ -36,26 +33,14 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   static const List<_DashboardTab> _tabs = [
-    _DashboardTab(
-      id: 'home',
-      label: 'Home',
-      icon: Icons.home_rounded,
-    ),
-    _DashboardTab(
-      id: 'history',
-      label: 'History',
-      icon: Icons.history_rounded,
-    ),
+    _DashboardTab(id: 'home', label: 'Home', icon: Icons.home_rounded),
+    _DashboardTab(id: 'history', label: 'History', icon: Icons.history_rounded),
     _DashboardTab(
       id: 'classes',
       label: 'Classes',
       icon: Icons.menu_book_rounded,
     ),
-    _DashboardTab(
-      id: 'profile',
-      label: 'Profile',
-      icon: Icons.person_rounded,
-    ),
+    _DashboardTab(id: 'profile', label: 'Profile', icon: Icons.person_rounded),
   ];
 
   int _selectedIndex = 0;
@@ -101,44 +86,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: AppColors.primaryContainer,
                     backgroundColor: AppColors.surfaceContainerLow,
                     onRefresh: () => dashboardController.refreshDashboard(),
-                    child: dashboardController.isLoading &&
-                            !dashboardController.hasLoadedOnce
-                        ? const Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : ListView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
-                            children: [
-                              if (dashboardController.errorMessage != null &&
-                                  !dashboardController.hasLoadedOnce)
-                                _ErrorCard(
-                                  message: dashboardController.errorMessage!,
-                                  onRetry: () => context
-                                      .read<DashboardController>()
-                                      .loadDashboard(forceRefresh: true),
-                                )
-                              else ...[
-                                _StatsGrid(controller: dashboardController),
-                                const SizedBox(height: 18),
-                                _ScanCallToAction(onTap: _handleScanTap),
-                                const SizedBox(height: 24),
-                                if (kDebugMode) ...[
-                                  _ScanPreviewTestingPanel(
-                                    onOpenSuccessPreview:
-                                        _openSuccessPreviewFromDashboard,
-                                    onOpenFailurePreview:
-                                        _openFailurePreviewFromDashboard,
-                                  ),
+                    child:
+                        dashboardController.isLoading &&
+                                !dashboardController.hasLoadedOnce
+                            ? const Center(child: CircularProgressIndicator())
+                            : ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(
+                                20,
+                                8,
+                                20,
+                                120,
+                              ),
+                              children: [
+                                if (dashboardController.errorMessage != null &&
+                                    !dashboardController.hasLoadedOnce)
+                                  _ErrorCard(
+                                    message: dashboardController.errorMessage!,
+                                    onRetry:
+                                        () => context
+                                            .read<DashboardController>()
+                                            .loadDashboard(forceRefresh: true),
+                                  )
+                                else ...[
+                                  _StatsGrid(controller: dashboardController),
+                                  const SizedBox(height: 18),
+                                  _ScanCallToAction(onTap: _handleScanTap),
                                   const SizedBox(height: 24),
+                                  _UpcomingClassesSection(
+                                    events: dashboardController.upcomingEvents,
+                                    onSeeAllTap: () => _openClasses(),
+                                  ),
                                 ],
-                                _UpcomingClassesSection(
-                                  events: dashboardController.upcomingEvents,
-                                  onSeeAllTap: () => _openClasses(),
-                                ),
                               ],
-                            ],
-                          ),
+                            ),
                   ),
                 ),
               ],
@@ -169,21 +150,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
       await _openProfile();
       return;
     }
-
-    _showSoonMessage(
-      '${_tabs[index].label} page will be added in the next batch.',
-    );
   }
 
   Future<void> _handleScanTap() async {
     final result = await Navigator.of(context).push<ScanFlowExitAction>(
       MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => QrScannerController(
-            qrScannerApiService: context.read<QrScannerApiService>(),
-          ),
-          child: const QrScannerScreen(),
-        ),
+        builder:
+            (_) => ChangeNotifierProvider(
+              create:
+                  (_) => QrScannerController(
+                    qrScannerApiService: context.read<QrScannerApiService>(),
+                  ),
+              child: const QrScannerScreen(),
+            ),
       ),
     );
 
@@ -205,16 +184,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _openAttendanceHistory() async {
-    final result = await Navigator.of(context).push<AttendanceHistoryExitAction>(
+    final result = await Navigator.of(
+      context,
+    ).push<AttendanceHistoryExitAction>(
       MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => AttendanceHistoryController(
-            apiService: AttendanceHistoryApiService(
-              firebaseAuthService: context.read<FirebaseAuthService>(),
+        builder:
+            (_) => ChangeNotifierProvider(
+              create:
+                  (_) => AttendanceHistoryController(
+                    apiService: AttendanceHistoryApiService(
+                      firebaseAuthService: context.read<FirebaseAuthService>(),
+                    ),
+                  )..loadHistory(),
+              child: const AttendanceHistoryScreen(),
             ),
-          )..loadHistory(),
-          child: const AttendanceHistoryScreen(),
-        ),
       ),
     );
 
@@ -237,14 +220,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _openClasses() async {
     final result = await Navigator.of(context).push<ClassesExitAction>(
       MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => StudentClassesController(
-            apiService: ClassesApiService(
-              firebaseAuthService: context.read<FirebaseAuthService>(),
+        builder:
+            (_) => ChangeNotifierProvider(
+              create:
+                  (_) => StudentClassesController(
+                    apiService: ClassesApiService(
+                      firebaseAuthService: context.read<FirebaseAuthService>(),
+                    ),
+                  ),
+              child: const StudentClassesScreen(),
             ),
-          ),
-          child: const StudentClassesScreen(),
-        ),
       ),
     );
 
@@ -270,9 +255,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _openProfile() async {
     final result = await Navigator.of(context).push<ProfileExitAction>(
-      MaterialPageRoute(
-        builder: (_) => const ProfileScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const ProfileScreen()),
     );
 
     if (!mounted || result == null) {
@@ -292,72 +275,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> _openSuccessPreviewFromDashboard() async {
-    final result = await Navigator.of(context).push<ScanFlowExitAction>(
-      MaterialPageRoute(
-        builder: (_) => ScanSuccessScreen(
-          data: ScanSuccessViewData(
-            eventName: 'Software Engineering Lecture',
-            verifiedAt: DateTime.now(),
-            statusLabel: 'Verified Present',
-            locationLabel: 'Location verified inside 100m geofence',
-            eventId: 1,
-          ),
-        ),
-      ),
-    );
-
-    if (!mounted || result == null) {
-      return;
-    }
-
-    if (result == ScanFlowExitAction.openHistory) {
-      _showSoonMessage('Attendance history page will be built in the next batch.');
-    }
-  }
-
-  Future<void> _openFailurePreviewFromDashboard() async {
-    final result = await Navigator.of(context).push<ScanFlowExitAction>(
-      MaterialPageRoute(
-        builder: (_) => const ScanFailureScreen(
-          data: ScanFailureViewData(
-            headline: 'Invalid QR Code',
-            badgeLabel: 'Verification Error',
-            summary:
-                'The scanned code is not recognized by the current event registry.',
-            reasons: [
-              ScanFailureReasonItem(
-                iconKind: ScanFailureIconKind.qrCode,
-                title: 'Token not recognized',
-                description:
-                    'The event QR code may be expired, corrupted, or generated for a different session.',
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    if (!mounted || result == null) {
-      return;
-    }
-
-    if (result == ScanFlowExitAction.retry) {
-      await _handleScanTap();
-    }
-  }
-
   Future<void> _handleNotificationsTap() async {
     final result = await Navigator.of(context).push<NotificationExitAction>(
       MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => NotificationsController(
-            apiService: NotificationsApiService(
-              firebaseAuthService: context.read<FirebaseAuthService>(),
+        builder:
+            (_) => ChangeNotifierProvider(
+              create:
+                  (_) => NotificationsController(
+                    apiService: NotificationsApiService(
+                      firebaseAuthService: context.read<FirebaseAuthService>(),
+                    ),
+                  ),
+              child: const NotificationsScreen(),
             ),
-          ),
-          child: const NotificationsScreen(),
-        ),
       ),
     );
 
@@ -387,12 +317,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  void _showSoonMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
   static String _greeting() {
     final hour = DateTime.now().hour;
 
@@ -407,11 +331,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   static String _initials(String fullName) {
-    final parts = fullName
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((part) => part.isNotEmpty)
-        .toList();
+    final parts =
+        fullName
+            .trim()
+            .split(RegExp(r'\s+'))
+            .where((part) => part.isNotEmpty)
+            .toList();
 
     if (parts.isEmpty) return 'Q';
 
@@ -453,16 +378,18 @@ class _DashboardHeader extends StatelessWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: AppColors.surfaceContainerLow,
-                backgroundImage: hasImage ? NetworkImage(profileImageUrl!) : null,
-                child: hasImage
-                    ? null
-                    : Text(
-                        initials,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w700,
+                backgroundImage:
+                    hasImage ? NetworkImage(profileImageUrl!) : null,
+                child:
+                    hasImage
+                        ? null
+                        : Text(
+                          initials,
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
               ),
               Positioned(
                 right: 2,
@@ -473,10 +400,7 @@ class _DashboardHeader extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.success,
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.background,
-                      width: 2,
-                    ),
+                    border: Border.all(color: AppColors.background, width: 2),
                   ),
                 ),
               ),
@@ -487,9 +411,9 @@ class _DashboardHeader extends StatelessWidget {
             child: Text(
               title,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
           Material(
@@ -584,79 +508,86 @@ class _StatsGrid extends StatelessWidget {
               ),
             ],
           ),
-          child: nextEvent == null
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Next Event',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No active events yet',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w800,
-                          ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Once an organizer creates upcoming sessions, they will appear here.',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                            height: 1.5,
-                          ),
-                    ),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Next Event',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      nextEvent.name,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppColors.primaryContainer,
-                            fontWeight: FontWeight.w800,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _buildEventMeta(nextEvent),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textSecondary,
-                            height: 1.45,
-                          ),
-                    ),
-                  ],
-                ),
+          child:
+              nextEvent == null
+                  ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Next Event',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No active events yet',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Once an organizer creates upcoming sessions, they will appear here.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  )
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Next Event',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        nextEvent.name,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppColors.primaryContainer,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _buildEventMeta(nextEvent),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.45,
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ],
     );
   }
 
   static String _buildEventMeta(EventItem event) {
-    final location = (event.locationName?.trim().isNotEmpty ?? false)
-        ? event.locationName!.trim()
-        : 'Location not set';
+    final location =
+        (event.locationName?.trim().isNotEmpty ?? false)
+            ? event.locationName!.trim()
+            : 'Location not set';
 
     return '$location • ${_formatEventDate(event.startTime)}';
   }
 
   static String _formatEventDate(DateTime value) {
     final now = DateTime.now();
-    final isToday = value.year == now.year &&
+    final isToday =
+        value.year == now.year &&
         value.month == now.month &&
         value.day == now.day;
 
@@ -668,9 +599,10 @@ class _StatsGrid extends StatelessWidget {
   }
 
   static String _formatTime(DateTime value) {
-    final hour = value.hour == 0
-        ? 12
-        : value.hour > 12
+    final hour =
+        value.hour == 0
+            ? 12
+            : value.hour > 12
             ? value.hour - 12
             : value.hour;
     final minute = value.minute.toString().padLeft(2, '0');
@@ -725,9 +657,9 @@ class _AttendanceRateCard extends StatelessWidget {
           Text(
             'Attendance Rate',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const Spacer(),
           SizedBox(
@@ -751,9 +683,9 @@ class _AttendanceRateCard extends StatelessWidget {
                 Text(
                   '$percentage%',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ],
             ),
@@ -780,10 +712,7 @@ class _ScanCallToAction extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary,
-              AppColors.primaryContainer,
-            ],
+            colors: [AppColors.primary, AppColors.primaryContainer],
           ),
           boxShadow: const [
             BoxShadow(
@@ -817,99 +746,22 @@ class _ScanCallToAction extends StatelessWidget {
                 Text(
                   'Scan QR Code',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'Log attendance instantly',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFFD8E4FF),
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: const Color(0xFFD8E4FF),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _ScanPreviewTestingPanel extends StatelessWidget {
-  const _ScanPreviewTestingPanel({
-    required this.onOpenSuccessPreview,
-    required this.onOpenFailurePreview,
-  });
-
-  final VoidCallback onOpenSuccessPreview;
-  final VoidCallback onOpenFailurePreview;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Temporary Scanner UI Testing',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'These buttons are only for previewing the QR success and failure screens without camera or backend scanning.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: onOpenSuccessPreview,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.success,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(54),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-              ),
-              icon: const Icon(Icons.check_circle_outline_rounded),
-              label: const Text('Open Success Preview'),
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: onOpenFailurePreview,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(54),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-              ),
-              icon: const Icon(Icons.error_outline_rounded),
-              label: const Text('Open Failure Preview'),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -935,15 +787,12 @@ class _UpcomingClassesSection extends StatelessWidget {
               child: Text(
                 'Upcoming Classes',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            TextButton(
-              onPressed: onSeeAllTap,
-              child: const Text('See all'),
-            ),
+            TextButton(onPressed: onSeeAllTap, child: const Text('See all')),
           ],
         ),
         const SizedBox(height: 10),
@@ -957,9 +806,9 @@ class _UpcomingClassesSection extends StatelessWidget {
             ),
             child: Text(
               'No upcoming classes available right now.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
             ),
           )
         else
@@ -1000,17 +849,19 @@ class _UpcomingClassesSection extends StatelessWidget {
   }
 
   static String _subtitleForEvent(EventItem event) {
-    final location = (event.locationName?.trim().isNotEmpty ?? false)
-        ? event.locationName!.trim()
-        : 'Location not set';
+    final location =
+        (event.locationName?.trim().isNotEmpty ?? false)
+            ? event.locationName!.trim()
+            : 'Location not set';
 
     return '$location • ${_monthShort(event.startTime.month)} ${event.startTime.day}';
   }
 
   static String _timeLabel(DateTime value) {
-    final hour = value.hour == 0
-        ? 12
-        : value.hour > 12
+    final hour =
+        value.hour == 0
+            ? 12
+            : value.hour > 12
             ? value.hour - 12
             : value.hour;
     final minute = value.minute.toString().padLeft(2, '0');
@@ -1120,17 +971,19 @@ class _DashboardBottomBar extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: isActive
-                            ? AppColors.primarySoft
-                            : Colors.transparent,
+                        color:
+                            isActive
+                                ? AppColors.primarySoft
+                                : Colors.transparent,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
                         tab.icon,
                         size: 22,
-                        color: isActive
-                            ? AppColors.primaryContainer
-                            : AppColors.textMuted,
+                        color:
+                            isActive
+                                ? AppColors.primaryContainer
+                                : AppColors.textMuted,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -1140,10 +993,10 @@ class _DashboardBottomBar extends StatelessWidget {
                       child: Text(
                         tab.label,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppColors.primaryContainer,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.8,
-                            ),
+                          color: AppColors.primaryContainer,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                        ),
                       ),
                     ),
                   ],
@@ -1158,10 +1011,7 @@ class _DashboardBottomBar extends StatelessWidget {
 }
 
 class _ErrorCard extends StatelessWidget {
-  const _ErrorCard({
-    required this.message,
-    required this.onRetry,
-  });
+  const _ErrorCard({required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
@@ -1180,22 +1030,19 @@ class _ErrorCard extends StatelessWidget {
           Text(
             'Unable to load dashboard',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             message,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: onRetry,
-            child: const Text('Retry'),
-          ),
+          ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
         ],
       ),
     );

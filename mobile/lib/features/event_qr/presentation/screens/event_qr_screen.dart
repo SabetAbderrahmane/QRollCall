@@ -22,7 +22,8 @@ class EventQrScreen extends StatelessWidget {
         canRegenerate: controller.canRegenerate,
         canEnd: controller.canEnd,
         onRegenerate: () async {
-          final success = await context.read<EventQrController>().regenerateCode();
+          final success =
+              await context.read<EventQrController>().regenerateCode();
 
           if (!context.mounted) return;
 
@@ -40,30 +41,31 @@ class EventQrScreen extends StatelessWidget {
         onEnd: () async {
           final shouldEnd = await showDialog<bool>(
             context: context,
-            builder: (_) => AlertDialog(
-              backgroundColor: AppColors.surface,
-              title: const Text(
-                'End event attendance?',
-                style: TextStyle(color: AppColors.textPrimary),
-              ),
-              content: const Text(
-                'This will deactivate the event. Students will no longer be able to mark attendance with this QR code.',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text(
-                    'End Event',
-                    style: TextStyle(color: AppColors.error),
+            builder:
+                (_) => AlertDialog(
+                  backgroundColor: AppColors.surface,
+                  title: const Text(
+                    'End event attendance?',
+                    style: TextStyle(color: AppColors.textPrimary),
                   ),
+                  content: const Text(
+                    'This will deactivate the event. Students will no longer be able to mark attendance with this QR code.',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text(
+                        'End Event',
+                        style: TextStyle(color: AppColors.error),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
           );
 
           if (shouldEnd != true || !context.mounted) return;
@@ -113,20 +115,9 @@ class EventQrScreen extends StatelessWidget {
                       child: Text(
                         'Event QR Code',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w900,
-                            ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => _showSoon(context, 'More actions will be added later.'),
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColors.surface,
-                        side: const BorderSide(color: AppColors.border),
-                      ),
-                      icon: const Icon(
-                        Icons.more_vert_rounded,
-                        color: AppColors.primaryContainer,
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
                   ],
@@ -151,26 +142,22 @@ class EventQrScreen extends StatelessWidget {
     );
   }
 
-  static Future<void> _copy(BuildContext context, String value, String message) async {
+  static Future<void> _copy(
+    BuildContext context,
+    String value,
+    String message,
+  ) async {
     await Clipboard.setData(ClipboardData(text: value));
     if (!context.mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
-  static void _showSoon(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
 class _EventHeader extends StatelessWidget {
-  const _EventHeader({
-    required this.controller,
-  });
+  const _EventHeader({required this.controller});
 
   final EventQrController controller;
 
@@ -182,10 +169,10 @@ class _EventHeader extends StatelessWidget {
           controller.event.name,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w900,
-                height: 1.1,
-              ),
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w900,
+            height: 1.1,
+          ),
         ),
         const SizedBox(height: 12),
         Container(
@@ -207,10 +194,10 @@ class _EventHeader extends StatelessWidget {
               Text(
                 controller.timeRangeLabel,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.3,
-                    ),
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.3,
+                ),
               ),
             ],
           ),
@@ -221,15 +208,14 @@ class _EventHeader extends StatelessWidget {
 }
 
 class _QrDisplayCard extends StatelessWidget {
-  const _QrDisplayCard({
-    required this.controller,
-  });
+  const _QrDisplayCard({required this.controller});
 
   final EventQrController controller;
 
   @override
   Widget build(BuildContext context) {
-    final expiredOrEnded = controller.windowState == EventQrWindowState.expired ||
+    final expiredOrEnded =
+        controller.windowState == EventQrWindowState.expired ||
         controller.windowState == EventQrWindowState.ended;
 
     return Container(
@@ -274,18 +260,18 @@ class _QrDisplayCard extends StatelessWidget {
                     Text(
                       'SESSION',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.38),
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 2.2,
-                          ),
+                        color: Colors.white.withValues(alpha: 0.38),
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2.2,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Event Registration',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                          ),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Expanded(
@@ -334,21 +320,23 @@ class _QrDisplayCard extends StatelessWidget {
                                       vertical: 10,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.error.withValues(alpha: 0.92),
+                                      color: AppColors.error.withValues(
+                                        alpha: 0.92,
+                                      ),
                                       borderRadius: BorderRadius.circular(999),
                                     ),
                                     child: Text(
-                                      controller.windowState == EventQrWindowState.ended
+                                      controller.windowState ==
+                                              EventQrWindowState.ended
                                           ? 'ENDED'
                                           : 'EXPIRED',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelMedium
-                                          ?.copyWith(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w900,
-                                            letterSpacing: 1.2,
-                                          ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.labelMedium?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.2,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -361,10 +349,10 @@ class _QrDisplayCard extends StatelessWidget {
                     Text(
                       'QROLLCALL SECURE SESSION',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.62),
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
-                          ),
+                        color: Colors.white.withValues(alpha: 0.62),
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
                     ),
                   ],
                 ),
@@ -391,10 +379,34 @@ class _CornerBrackets extends StatelessWidget {
       height: 300,
       child: Stack(
         children: [
-          _corner(top: 0, left: 0, topBorder: true, leftBorder: true, color: color),
-          _corner(top: 0, right: 0, topBorder: true, rightBorder: true, color: color),
-          _corner(bottom: 0, left: 0, bottomBorder: true, leftBorder: true, color: color),
-          _corner(bottom: 0, right: 0, bottomBorder: true, rightBorder: true, color: color),
+          _corner(
+            top: 0,
+            left: 0,
+            topBorder: true,
+            leftBorder: true,
+            color: color,
+          ),
+          _corner(
+            top: 0,
+            right: 0,
+            topBorder: true,
+            rightBorder: true,
+            color: color,
+          ),
+          _corner(
+            bottom: 0,
+            left: 0,
+            bottomBorder: true,
+            leftBorder: true,
+            color: color,
+          ),
+          _corner(
+            bottom: 0,
+            right: 0,
+            bottomBorder: true,
+            rightBorder: true,
+            color: color,
+          ),
         ],
       ),
     );
@@ -421,10 +433,22 @@ class _CornerBrackets extends StatelessWidget {
         height: 42,
         decoration: BoxDecoration(
           border: Border(
-            top: topBorder ? BorderSide(color: color, width: 4) : BorderSide.none,
-            bottom: bottomBorder ? BorderSide(color: color, width: 4) : BorderSide.none,
-            left: leftBorder ? BorderSide(color: color, width: 4) : BorderSide.none,
-            right: rightBorder ? BorderSide(color: color, width: 4) : BorderSide.none,
+            top:
+                topBorder
+                    ? BorderSide(color: color, width: 4)
+                    : BorderSide.none,
+            bottom:
+                bottomBorder
+                    ? BorderSide(color: color, width: 4)
+                    : BorderSide.none,
+            left:
+                leftBorder
+                    ? BorderSide(color: color, width: 4)
+                    : BorderSide.none,
+            right:
+                rightBorder
+                    ? BorderSide(color: color, width: 4)
+                    : BorderSide.none,
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -434,9 +458,7 @@ class _CornerBrackets extends StatelessWidget {
 }
 
 class _TimerPill extends StatelessWidget {
-  const _TimerPill({
-    required this.controller,
-  });
+  const _TimerPill({required this.controller});
 
   final EventQrController controller;
 
@@ -450,9 +472,10 @@ class _TimerPill extends StatelessWidget {
         color: isActive ? const Color(0xFF0B2A61) : const Color(0xFF2A0A11),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
-          color: isActive
-              ? AppColors.primaryContainer.withValues(alpha: 0.28)
-              : AppColors.error.withValues(alpha: 0.24),
+          color:
+              isActive
+                  ? AppColors.primaryContainer.withValues(alpha: 0.28)
+                  : AppColors.error.withValues(alpha: 0.24),
         ),
       ),
       child: Row(
@@ -475,16 +498,16 @@ class _TimerPill extends StatelessWidget {
           Text(
             '${controller.validityLabel} ',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           Text(
             controller.countdownText,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: isActive ? AppColors.primaryContainer : AppColors.error,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: isActive ? AppColors.primaryContainer : AppColors.error,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -493,9 +516,7 @@ class _TimerPill extends StatelessWidget {
 }
 
 class _QuickActions extends StatelessWidget {
-  const _QuickActions({
-    required this.controller,
-  });
+  const _QuickActions({required this.controller});
 
   final EventQrController controller;
 
@@ -513,19 +534,6 @@ class _QuickActions extends StatelessWidget {
                   text:
                       'QRollCall event QR payload for ${controller.event.name}:\n${controller.qrPayloadJson}',
                 ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _QuickActionButton(
-            icon: Icons.print_rounded,
-            label: 'Print',
-            onTap: () {
-              EventQrScreen._showSoon(
-                context,
-                'Print/PDF export will be added in the reports batch.',
               );
             },
           ),
@@ -583,19 +591,16 @@ class _QuickActionButton extends StatelessWidget {
                   color: const Color(0xFF0B2A61),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(
-                  icon,
-                  color: AppColors.primaryContainer,
-                ),
+                child: Icon(icon, color: AppColors.primaryContainer),
               ),
               const SizedBox(height: 10),
               Text(
                 label.toUpperCase(),
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.1,
-                    ),
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.1,
+                ),
               ),
             ],
           ),
@@ -628,20 +633,17 @@ class _InfoBanner extends StatelessWidget {
               color: const Color(0xFF34C759),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(
-              Icons.info_rounded,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.info_rounded, color: Colors.white),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Text(
               'Keep this screen visible for students to scan. The backend still validates token, time window, location, and authentication.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFFA7F3B9),
-                    height: 1.45,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: const Color(0xFFA7F3B9),
+                height: 1.45,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -651,9 +653,7 @@ class _InfoBanner extends StatelessWidget {
 }
 
 class _ErrorBanner extends StatelessWidget {
-  const _ErrorBanner({
-    required this.message,
-  });
+  const _ErrorBanner({required this.message});
 
   final String message;
 
@@ -664,23 +664,18 @@ class _ErrorBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF2A0A11),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AppColors.error.withValues(alpha: 0.35),
-        ),
+        border: Border.all(color: AppColors.error.withValues(alpha: 0.35)),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.error_outline_rounded,
-            color: AppColors.error,
-          ),
+          const Icon(Icons.error_outline_rounded, color: AppColors.error),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFFFFC8CC),
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: const Color(0xFFFFC8CC)),
             ),
           ),
         ],
@@ -714,9 +709,7 @@ class _QrActionBar extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
         decoration: BoxDecoration(
           color: AppColors.background.withValues(alpha: 0.96),
-          border: const Border(
-            top: BorderSide(color: AppColors.border),
-          ),
+          border: const Border(top: BorderSide(color: AppColors.border)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -734,16 +727,19 @@ class _QrActionBar extends StatelessWidget {
                     borderRadius: BorderRadius.circular(22),
                   ),
                 ),
-                icon: isRegenerating
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Icon(Icons.qr_code_2_rounded),
+                icon:
+                    isRegenerating
+                        ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                        : const Icon(Icons.qr_code_2_rounded),
                 label: Text(
                   isRegenerating ? 'Generating...' : 'Regenerate Code',
                 ),
@@ -766,14 +762,17 @@ class _QrActionBar extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                icon: isEnding
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.cancel_outlined),
-                label: Text(isEnding ? 'Ending Event...' : 'End Event Attendance'),
+                icon:
+                    isEnding
+                        ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.cancel_outlined),
+                label: Text(
+                  isEnding ? 'Ending Event...' : 'End Event Attendance',
+                ),
               ),
             ),
           ],

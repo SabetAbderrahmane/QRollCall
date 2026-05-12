@@ -113,9 +113,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
     Navigator.of(context).pop(action);
   }
 
-  Future<ScanFlowExitAction?> _presentScanOutcome(
-    ScanProcessOutcome outcome,
-  ) {
+  Future<ScanFlowExitAction?> _presentScanOutcome(ScanProcessOutcome outcome) {
     if (outcome is ScanSuccessOutcome) {
       return Navigator.of(context).push<ScanFlowExitAction>(
         MaterialPageRoute(
@@ -140,19 +138,9 @@ class _QrScannerScreenState extends State<QrScannerScreen>
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Torch is unavailable on this device.'),
-        ),
+        const SnackBar(content: Text('Torch is unavailable on this device.')),
       );
     }
-  }
-
-  void _handleGalleryTap() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Gallery-based QR import will be added in a later batch.'),
-      ),
-    );
   }
 
   @override
@@ -171,36 +159,36 @@ class _QrScannerScreenState extends State<QrScannerScreen>
           return Stack(
             children: [
               Positioned.fill(
-                child: _cameraErrorMessage == null
-                    ? MobileScanner(controller: _cameraController)
-                    : Container(
-                        color: AppColors.surface,
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.videocam_off_rounded,
-                              color: AppColors.textSecondary,
-                              size: 54,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _cameraErrorMessage!,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: AppColors.textPrimary,
-                                  ),
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: _startScanner,
-                              child: const Text('Retry camera'),
-                            ),
-                          ],
+                child:
+                    _cameraErrorMessage == null
+                        ? MobileScanner(controller: _cameraController)
+                        : Container(
+                          color: AppColors.surface,
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.videocam_off_rounded,
+                                color: AppColors.textSecondary,
+                                size: 54,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                _cameraErrorMessage!,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(color: AppColors.textPrimary),
+                              ),
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: _startScanner,
+                                child: const Text('Retry camera'),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
               ),
               Positioned.fill(
                 child: CustomPaint(
@@ -263,10 +251,10 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                     'Point your camera at the QR code displayed by your teacher or event organizer.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.white.withOpacity(0.92),
-                          fontWeight: FontWeight.w500,
-                          height: 1.45,
-                        ),
+                      color: Colors.white.withOpacity(0.92),
+                      fontWeight: FontWeight.w500,
+                      height: 1.45,
+                    ),
                   ),
                 ),
               ),
@@ -280,15 +268,11 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _FloatingActionControl(
-                        onTap: _handleGalleryTap,
-                        icon: Icons.photo_library_outlined,
-                      ),
-                      const SizedBox(width: 28),
-                      _FloatingActionControl(
                         onTap: _toggleTorch,
-                        icon: _isTorchEnabled
-                            ? Icons.flashlight_on_rounded
-                            : Icons.flashlight_off_rounded,
+                        icon:
+                            _isTorchEnabled
+                                ? Icons.flashlight_on_rounded
+                                : Icons.flashlight_off_rounded,
                         highlighted: _isTorchEnabled,
                       ),
                     ],
@@ -315,25 +299,23 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                             const SizedBox(height: 18),
                             Text(
                               'Verifying attendance…',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    color: AppColors.textPrimary,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Checking QR token, time window, location, and attendance status.',
                               textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    color: AppColors.textSecondary,
-                                    height: 1.45,
-                                  ),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.textSecondary,
+                                height: 1.45,
+                              ),
                             ),
                           ],
                         ),
@@ -350,10 +332,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
 }
 
 class _ScannerFrame extends StatelessWidget {
-  const _ScannerFrame({
-    required this.size,
-    required this.scanLineController,
-  });
+  const _ScannerFrame({required this.size, required this.scanLineController});
 
   final double size;
   final AnimationController scanLineController;
@@ -458,30 +437,34 @@ class _ScannerCorner extends StatelessWidget {
             bottomRight: Radius.circular(!isTop && !isLeft ? 26 : 0),
           ),
           border: Border(
-            top: isTop
-                ? const BorderSide(
-                    color: AppColors.primaryContainer,
-                    width: 4,
-                  )
-                : BorderSide.none,
-            bottom: !isTop
-                ? const BorderSide(
-                    color: AppColors.primaryContainer,
-                    width: 4,
-                  )
-                : BorderSide.none,
-            left: isLeft
-                ? const BorderSide(
-                    color: AppColors.primaryContainer,
-                    width: 4,
-                  )
-                : BorderSide.none,
-            right: !isLeft
-                ? const BorderSide(
-                    color: AppColors.primaryContainer,
-                    width: 4,
-                  )
-                : BorderSide.none,
+            top:
+                isTop
+                    ? const BorderSide(
+                      color: AppColors.primaryContainer,
+                      width: 4,
+                    )
+                    : BorderSide.none,
+            bottom:
+                !isTop
+                    ? const BorderSide(
+                      color: AppColors.primaryContainer,
+                      width: 4,
+                    )
+                    : BorderSide.none,
+            left:
+                isLeft
+                    ? const BorderSide(
+                      color: AppColors.primaryContainer,
+                      width: 4,
+                    )
+                    : BorderSide.none,
+            right:
+                !isLeft
+                    ? const BorderSide(
+                      color: AppColors.primaryContainer,
+                      width: 4,
+                    )
+                    : BorderSide.none,
           ),
         ),
       ),
@@ -490,10 +473,7 @@ class _ScannerCorner extends StatelessWidget {
 }
 
 class _RoundGlassButton extends StatelessWidget {
-  const _RoundGlassButton({
-    required this.onTap,
-    required this.child,
-  });
+  const _RoundGlassButton({required this.onTap, required this.child});
 
   final VoidCallback onTap;
   final Widget child;
@@ -506,11 +486,7 @@ class _RoundGlassButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
-        child: SizedBox(
-          width: 48,
-          height: 48,
-          child: Center(child: child),
-        ),
+        child: SizedBox(width: 48, height: 48, child: Center(child: child)),
       ),
     );
   }
@@ -530,9 +506,10 @@ class _FloatingActionControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: highlighted
-          ? AppColors.primaryContainer
-          : Colors.white.withOpacity(0.12),
+      color:
+          highlighted
+              ? AppColors.primaryContainer
+              : Colors.white.withOpacity(0.12),
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: onTap,
@@ -558,19 +535,15 @@ class _ScannerMaskPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final overlayPaint = Paint()
-      ..color = Colors.black.withOpacity(0.58);
+    final overlayPaint = Paint()..color = Colors.black.withOpacity(0.58);
 
-    final fullScreenPath = Path()
-      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    final fullScreenPath =
+        Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    final cutoutPath = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          scanRect,
-          const Radius.circular(26),
-        ),
-      );
+    final cutoutPath =
+        Path()..addRRect(
+          RRect.fromRectAndRadius(scanRect, const Radius.circular(26)),
+        );
 
     final result = Path.combine(
       PathOperation.difference,

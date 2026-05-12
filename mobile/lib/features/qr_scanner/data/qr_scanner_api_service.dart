@@ -23,8 +23,8 @@ class QrScannerApiService {
   QrScannerApiService({
     required FirebaseAuthService firebaseAuthService,
     http.Client? client,
-  })  : _firebaseAuthService = firebaseAuthService,
-        _client = client ?? http.Client();
+  }) : _firebaseAuthService = firebaseAuthService,
+       _client = client ?? http.Client();
 
   final FirebaseAuthService _firebaseAuthService;
   final http.Client _client;
@@ -73,8 +73,32 @@ class QrScannerApiService {
       if (detail is String && detail.trim().isNotEmpty) {
         return detail.trim();
       }
+
+      if (detail is Map<String, dynamic>) {
+        final message =
+            detail['message'] ?? detail['error'] ?? detail['reason'];
+        if (message is String && message.trim().isNotEmpty) {
+          return message.trim();
+        }
+
+        return jsonEncode(detail);
+      }
+
+      if (detail is List && detail.isNotEmpty) {
+        return detail.map((item) => item.toString()).join(' ');
+      }
+
+      for (final key in const ['message', 'error', 'reason']) {
+        final message = payload[key];
+        if (message is String && message.trim().isNotEmpty) {
+          return message.trim();
+        }
+      }
     } catch (_) {
-      // ignore
+      final body = response.body.trim();
+      if (body.isNotEmpty) {
+        return body;
+      }
     }
 
     return 'Scanner request failed with status ${response.statusCode}.';

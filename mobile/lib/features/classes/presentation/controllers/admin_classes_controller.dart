@@ -23,7 +23,10 @@ class AdminClassesController extends ChangeNotifier {
     try {
       _createdClasses = await apiService.fetchCreatedClasses();
     } catch (e) {
-      _errorMessage = 'Could not load your classes.';
+      _errorMessage =
+          kDebugMode
+              ? e.toString().replaceFirst('Exception: ', '')
+              : 'Unable to load classes. Please check the backend connection and try again.';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -36,7 +39,10 @@ class AdminClassesController extends ChangeNotifier {
       await loadClasses();
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to create class';
+      _errorMessage =
+          kDebugMode
+              ? e.toString().replaceFirst('Exception: ', '')
+              : 'Unable to create class. Please check the form and backend connection.';
       notifyListeners();
       return false;
     }

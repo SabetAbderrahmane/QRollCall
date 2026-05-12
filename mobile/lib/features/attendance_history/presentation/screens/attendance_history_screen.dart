@@ -6,11 +6,7 @@ import 'package:qrollcall_mobile/features/attendance_history/presentation/widget
 import 'package:qrollcall_mobile/features/attendance_history/presentation/widgets/attendance_history_record_tile.dart';
 import 'package:qrollcall_mobile/features/auth/presentation/controllers/auth_controller.dart';
 
-enum AttendanceHistoryExitAction {
-  home,
-  scan,
-  profile,
-}
+enum AttendanceHistoryExitAction { home, scan, profile }
 
 class AttendanceHistoryScreen extends StatelessWidget {
   const AttendanceHistoryScreen({super.key});
@@ -34,12 +30,13 @@ class AttendanceHistoryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: _pageBackground,
       bottomNavigationBar: _HistoryBottomBar(
-        onHomeTap: () =>
-            Navigator.of(context).pop(AttendanceHistoryExitAction.home),
-        onScanTap: () =>
-            Navigator.of(context).pop(AttendanceHistoryExitAction.scan),
-        onProfileTap: () =>
-            Navigator.of(context).pop(AttendanceHistoryExitAction.profile),
+        onHomeTap:
+            () => Navigator.of(context).pop(AttendanceHistoryExitAction.home),
+        onScanTap:
+            () => Navigator.of(context).pop(AttendanceHistoryExitAction.scan),
+        onProfileTap:
+            () =>
+                Navigator.of(context).pop(AttendanceHistoryExitAction.profile),
       ),
       body: Stack(
         children: [
@@ -52,88 +49,98 @@ class AttendanceHistoryScreen extends StatelessWidget {
                   profileImageUrl: user?.profileImageUrl,
                 ),
                 Expanded(
-                  child: controller.isLoading && !controller.hasLoadedOnce
-                      ? const Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : RefreshIndicator(
-                          color: _brandBlueBright,
-                          onRefresh: controller.refreshHistory,
-                          child: ListView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
-                            children: [
-                              if (controller.errorMessage != null &&
-                                  !controller.hasLoadedOnce)
-                                _ErrorCard(
-                                  message: controller.errorMessage!,
-                                  onRetry: () =>
-                                      controller.loadHistory(forceRefresh: true),
-                                )
-                              else ...[
-                                if (controller.hasAnyRecords) ...[
-                                  _AttendanceOverviewCard(
-                                    percentage: controller.attendancePercentage,
-                                    performanceLabel: controller.performanceLabel,
-                                    presentCount: controller.presentCount,
-                                    totalCount: controller.totalCount,
-                                  ),
-                                  const SizedBox(height: 20),
-                                ] else ...[
-                                  Text(
-                                    'Attendance History',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall
-                                        ?.copyWith(
-                                          color: _textPrimary,
-                                          fontWeight: FontWeight.w900,
+                  child:
+                      controller.isLoading && !controller.hasLoadedOnce
+                          ? const Center(child: CircularProgressIndicator())
+                          : RefreshIndicator(
+                            color: _brandBlueBright,
+                            onRefresh: controller.refreshHistory,
+                            child: ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(
+                                20,
+                                8,
+                                20,
+                                120,
+                              ),
+                              children: [
+                                if (controller.errorMessage != null &&
+                                    !controller.hasLoadedOnce)
+                                  _ErrorCard(
+                                    message: controller.errorMessage!,
+                                    onRetry:
+                                        () => controller.loadHistory(
+                                          forceRefresh: true,
                                         ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                ],
-                                _FilterTabs(
-                                  selectedFilter: controller.selectedFilter,
-                                  onChanged: controller.setFilter,
-                                ),
-                                const SizedBox(height: 20),
-                                if (controller.filteredEntries.isEmpty)
-                                  AttendanceHistoryEmptyState(
-                                    title: controller.emptyStateTitle,
-                                    subtitle: controller.emptyStateSubtitle,
-                                    showPrimaryAction:
-                                        controller.shouldShowPrimaryEmptyAction,
-                                    onPrimaryAction: controller
-                                            .shouldShowPrimaryEmptyAction
-                                        ? () => Navigator.of(context).pop(
-                                              AttendanceHistoryExitAction.scan,
-                                            )
-                                        : null,
                                   )
                                 else ...[
-                                  Text(
-                                    'Recent Records',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(
-                                          color: _textPrimary,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  ...List.generate(
-                                    controller.filteredEntries.length,
-                                    (index) => AttendanceHistoryRecordTile(
-                                      entry: controller.filteredEntries[index],
-                                      index: index,
+                                  if (controller.hasAnyRecords) ...[
+                                    _AttendanceOverviewCard(
+                                      percentage:
+                                          controller.attendancePercentage,
+                                      performanceLabel:
+                                          controller.performanceLabel,
+                                      presentCount: controller.presentCount,
+                                      totalCount: controller.totalCount,
                                     ),
+                                    const SizedBox(height: 20),
+                                  ] else ...[
+                                    Text(
+                                      'Attendance History',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.headlineSmall?.copyWith(
+                                        color: _textPrimary,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+                                  _FilterTabs(
+                                    selectedFilter: controller.selectedFilter,
+                                    onChanged: controller.setFilter,
                                   ),
+                                  const SizedBox(height: 20),
+                                  if (controller.filteredEntries.isEmpty)
+                                    AttendanceHistoryEmptyState(
+                                      title: controller.emptyStateTitle,
+                                      subtitle: controller.emptyStateSubtitle,
+                                      showPrimaryAction:
+                                          controller
+                                              .shouldShowPrimaryEmptyAction,
+                                      onPrimaryAction:
+                                          controller
+                                                  .shouldShowPrimaryEmptyAction
+                                              ? () => Navigator.of(context).pop(
+                                                AttendanceHistoryExitAction
+                                                    .scan,
+                                              )
+                                              : null,
+                                    )
+                                  else ...[
+                                    Text(
+                                      'Recent Records',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.copyWith(
+                                        color: _textPrimary,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 14),
+                                    ...List.generate(
+                                      controller.filteredEntries.length,
+                                      (index) => AttendanceHistoryRecordTile(
+                                        entry:
+                                            controller.filteredEntries[index],
+                                        index: index,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ],
-                            ],
+                            ),
                           ),
-                        ),
                 ),
               ],
             ),
@@ -144,11 +151,12 @@ class AttendanceHistoryScreen extends StatelessWidget {
   }
 
   static String _initials(String name) {
-    final parts = name
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((part) => part.isNotEmpty)
-        .toList();
+    final parts =
+        name
+            .trim()
+            .split(RegExp(r'\s+'))
+            .where((part) => part.isNotEmpty)
+            .toList();
 
     if (parts.isEmpty) return 'QR';
     if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
@@ -206,10 +214,7 @@ class _HistoryBackdrop extends StatelessWidget {
 }
 
 class _HistoryTopBar extends StatelessWidget {
-  const _HistoryTopBar({
-    required this.initials,
-    required this.profileImageUrl,
-  });
+  const _HistoryTopBar({required this.initials, required this.profileImageUrl});
 
   final String initials;
   final String? profileImageUrl;
@@ -223,48 +228,31 @@ class _HistoryTopBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Menu panel will be added in a later batch.'),
-                ),
-              );
-            },
-            style: IconButton.styleFrom(
-              backgroundColor: AttendanceHistoryScreen._surface,
-              side: const BorderSide(
-                color: AttendanceHistoryScreen._outlineVariant,
-              ),
-            ),
-            icon: const Icon(
-              Icons.menu_rounded,
-              color: AttendanceHistoryScreen._brandBlueBright,
-            ),
-          ),
+          const SizedBox(width: 48),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               'Attendance Registry',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AttendanceHistoryScreen._textPrimary,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: AttendanceHistoryScreen._textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
           CircleAvatar(
             radius: 22,
             backgroundColor: const Color(0xFF0B2A61),
             backgroundImage: hasImage ? NetworkImage(profileImageUrl!) : null,
-            child: hasImage
-                ? null
-                : Text(
-                    initials,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
+            child:
+                hasImage
+                    ? null
+                    : Text(
+                      initials,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
           ),
         ],
       ),
@@ -295,9 +283,7 @@ class _AttendanceOverviewCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AttendanceHistoryScreen._surface,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(
-          color: AttendanceHistoryScreen._outlineVariant,
-        ),
+        border: Border.all(color: AttendanceHistoryScreen._outlineVariant),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.18),
@@ -315,9 +301,9 @@ class _AttendanceOverviewCard extends StatelessWidget {
                 Text(
                   'Overall Attendance',
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: AttendanceHistoryScreen._textSecondary,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    color: AttendanceHistoryScreen._textSecondary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -326,19 +312,21 @@ class _AttendanceOverviewCard extends StatelessWidget {
                     Text(
                       '$percentage',
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                            color: AttendanceHistoryScreen._textPrimary,
-                            fontWeight: FontWeight.w900,
-                            height: 0.95,
-                          ),
+                        color: AttendanceHistoryScreen._textPrimary,
+                        fontWeight: FontWeight.w900,
+                        height: 0.95,
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 4, bottom: 6),
                       child: Text(
                         '%',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: AttendanceHistoryScreen._textPrimary,
-                              fontWeight: FontWeight.w800,
-                            ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.headlineSmall?.copyWith(
+                          color: AttendanceHistoryScreen._textPrimary,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ],
@@ -350,9 +338,10 @@ class _AttendanceOverviewCard extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: onTrack
-                        ? const Color(0xFF12351A)
-                        : const Color(0xFF3C2C12),
+                    color:
+                        onTrack
+                            ? const Color(0xFF12351A)
+                            : const Color(0xFF3C2C12),
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Row(
@@ -363,19 +352,21 @@ class _AttendanceOverviewCard extends StatelessWidget {
                             ? Icons.check_circle_rounded
                             : Icons.info_rounded,
                         size: 18,
-                        color: onTrack
-                            ? const Color(0xFF57D26C)
-                            : const Color(0xFFFFC266),
+                        color:
+                            onTrack
+                                ? const Color(0xFF57D26C)
+                                : const Color(0xFFFFC266),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         performanceLabel,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: onTrack
+                          color:
+                              onTrack
                                   ? const Color(0xFF57D26C)
                                   : const Color(0xFFFFC266),
-                              fontWeight: FontWeight.w800,
-                            ),
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ],
                   ),
@@ -437,17 +428,17 @@ class _MiniMetric extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: foreground,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: foreground,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: foreground,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: foreground,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -456,10 +447,7 @@ class _MiniMetric extends StatelessWidget {
 }
 
 class _FilterTabs extends StatelessWidget {
-  const _FilterTabs({
-    required this.selectedFilter,
-    required this.onChanged,
-  });
+  const _FilterTabs({required this.selectedFilter, required this.onChanged});
 
   final AttendanceHistoryFilter selectedFilter;
   final ValueChanged<AttendanceHistoryFilter> onChanged;
@@ -471,9 +459,7 @@ class _FilterTabs extends StatelessWidget {
       decoration: BoxDecoration(
         color: AttendanceHistoryScreen._surfaceElevated,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AttendanceHistoryScreen._outlineVariant,
-        ),
+        border: Border.all(color: AttendanceHistoryScreen._outlineVariant),
       ),
       child: Row(
         children: [
@@ -521,9 +507,7 @@ class _FilterButton extends StatelessWidget {
     final idleColor = AttendanceHistoryScreen._textSecondary;
 
     return Material(
-      color: selected
-          ? AttendanceHistoryScreen._surface
-          : Colors.transparent,
+      color: selected ? AttendanceHistoryScreen._surface : Colors.transparent,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -534,9 +518,9 @@ class _FilterButton extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: selected ? selectedColor : idleColor,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: selected ? selectedColor : idleColor,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         ),
@@ -566,9 +550,7 @@ class _HistoryBottomBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: AttendanceHistoryScreen._surface,
           borderRadius: BorderRadius.circular(26),
-          border: Border.all(
-            color: AttendanceHistoryScreen._outlineVariant,
-          ),
+          border: Border.all(color: AttendanceHistoryScreen._outlineVariant),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.18),
@@ -637,17 +619,14 @@ class _BottomNavItem extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: selected ? selectedColor : idleColor,
-            ),
+            Icon(icon, color: selected ? selectedColor : idleColor),
             const SizedBox(height: 4),
             Text(
               label,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: selected ? selectedColor : idleColor,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: selected ? selectedColor : idleColor,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ],
         ),
@@ -657,10 +636,7 @@ class _BottomNavItem extends StatelessWidget {
 }
 
 class _ErrorCard extends StatelessWidget {
-  const _ErrorCard({
-    required this.message,
-    required this.onRetry,
-  });
+  const _ErrorCard({required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
@@ -673,9 +649,7 @@ class _ErrorCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AttendanceHistoryScreen._surface,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(
-          color: const Color(0xFF48222A),
-        ),
+        border: Border.all(color: const Color(0xFF48222A)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -683,17 +657,17 @@ class _ErrorCard extends StatelessWidget {
           Text(
             'Unable to load attendance history',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AttendanceHistoryScreen._textPrimary,
-                  fontWeight: FontWeight.w800,
-                ),
+              color: AttendanceHistoryScreen._textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 10),
           Text(
             message,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AttendanceHistoryScreen._textSecondary,
-                  height: 1.5,
-                ),
+              color: AttendanceHistoryScreen._textSecondary,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 18),
           ElevatedButton(

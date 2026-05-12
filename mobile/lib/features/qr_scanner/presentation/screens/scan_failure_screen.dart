@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:qrollcall_mobile/features/qr_scanner/models/scan_result_models.dart';
 
 class ScanFailureScreen extends StatefulWidget {
-  const ScanFailureScreen({
-    super.key,
-    required this.data,
-  });
+  const ScanFailureScreen({super.key, required this.data});
 
   final ScanFailureViewData data;
 
@@ -125,6 +122,14 @@ class _ScanFailureScreenState extends State<ScanFailureScreen>
           final heroScale = _heroScale.value.clamp(0.001, 1.0);
           final ringPulse = 1 + (_pulseController.value * 0.05);
           final glowPulse = 0.10 + (_pulseController.value * 0.10);
+          final screenHeight = MediaQuery.of(context).size.height;
+          final dense = screenHeight < 680;
+          final compact = screenHeight < 760;
+          final heroWidth = dense ? 176.0 : (compact ? 220.0 : 300.0);
+          final heroHeight = dense ? 150.0 : (compact ? 190.0 : 250.0);
+          final coreSize = dense ? 124.0 : (compact ? 156.0 : 190.0);
+          final cardPadding = dense ? 14.0 : (compact ? 16.0 : 22.0);
+          final buttonHeight = dense ? 48.0 : (compact ? 52.0 : 62.0);
 
           return Container(
             decoration: BoxDecoration(
@@ -137,434 +142,443 @@ class _ScanFailureScreenState extends State<ScanFailureScreen>
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: IgnorePointer(
-                    child: _FailureBackdrop(wash: wash),
-                  ),
+                  child: IgnorePointer(child: _FailureBackdrop(wash: wash)),
                 ),
                 SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      dense ? 12 : 18,
+                      20,
+                      dense ? 18 : 24,
+                    ),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const _FailureTopBar(),
-                        const SizedBox(height: 12),
-                        Expanded(
-                          child: Column(
+                        SizedBox(height: dense ? 6 : (compact ? 10 : 18)),
+                        SizedBox(
+                          width: heroWidth,
+                          height: heroHeight,
+                          child: Stack(
+                            alignment: Alignment.center,
                             children: [
-                              const Spacer(flex: 2),
-
-                              /// HERO
-                              SizedBox(
-                                width: 300,
-                                height: 250,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Transform.scale(
-                                      scale: 0.85 + (_shockwave.value * 1.0),
-                                      child: Container(
-                                        width: 230,
-                                        height: 230,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          gradient: RadialGradient(
-                                            colors: [
-                                              const Color(0xFFFF4B58).withValues(
-                                                alpha: 0.12 + (wash * 0.18),
-                                              ),
-                                              const Color(0xFFFF4B58).withValues(
-                                                alpha: 0.04 + (wash * 0.08),
-                                              ),
-                                              Colors.transparent,
-                                            ],
-                                          ),
+                              Transform.scale(
+                                scale: 0.85 + (_shockwave.value * 1.0),
+                                child: Container(
+                                  width: heroHeight * 0.92,
+                                  height: heroHeight * 0.92,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        const Color(0xFFFF4B58).withValues(
+                                          alpha: 0.12 + (wash * 0.18),
                                         ),
-                                      ),
+                                        const Color(0xFFFF4B58).withValues(
+                                          alpha: 0.04 + (wash * 0.08),
+                                        ),
+                                        Colors.transparent,
+                                      ],
                                     ),
-                                    Transform.scale(
-                                      scale: (0.86 + (_ringExpand.value * 0.45)) *
-                                          ringPulse,
-                                      child: Container(
-                                        width: 215,
-                                        height: 215,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: const Color(0xFFFF4B58)
-                                                .withValues(
-                                              alpha: 0.10 + glowPulse,
-                                            ),
-                                            width: 2.2,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Transform.translate(
-                                      offset: Offset(0, _heroLift.value),
-                                      child: Transform(
-                                        alignment: Alignment.center,
-                                        transform: Matrix4.identity()
-                                          ..setEntry(3, 2, 0.0012)
-                                          ..rotateZ((1 - heroScale) * -0.22)
-                                          ..scale(heroScale),
-                                        child: SizedBox(
-                                          width: 190,
-                                          height: 190,
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              const _SlashBeam(
-                                                angle: -0.62,
-                                                width: 168,
-                                                height: 18,
-                                              ),
-                                              const _SlashBeam(
-                                                angle: 0.62,
-                                                width: 168,
-                                                height: 18,
-                                              ),
-                                              Container(
-                                                width: 132,
-                                                height: 132,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(36),
-                                                  gradient: const LinearGradient(
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.bottomRight,
-                                                    colors: [
-                                                      Color(0xFF29070C),
-                                                      Color(0xFF170408),
-                                                      Color(0xFF0E0306),
-                                                    ],
-                                                  ),
-                                                  border: Border.all(
-                                                    color: const Color(0xFFFF5562)
-                                                        .withValues(alpha: 0.42),
-                                                    width: 1.6,
-                                                  ),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: const Color(0xFFFF4B58)
-                                                          .withValues(
-                                                        alpha: 0.18,
-                                                      ),
-                                                      blurRadius: 28,
-                                                      spreadRadius: 2,
-                                                      offset:
-                                                          const Offset(0, 12),
-                                                    ),
-                                                    BoxShadow(
-                                                      color: Colors.black
-                                                          .withValues(alpha: 0.28),
-                                                      blurRadius: 18,
-                                                      offset:
-                                                          const Offset(0, 12),
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: Stack(
-                                                  children: [
-                                                    Positioned.fill(
-                                                      child: DecoratedBox(
-                                                        decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                  36),
-                                                          gradient:
-                                                              LinearGradient(
-                                                            begin:
-                                                                Alignment.topCenter,
-                                                            end: Alignment.bottomCenter,
-                                                            colors: [
-                                                              Colors.white
-                                                                  .withValues(
-                                                                      alpha: 0.10),
-                                                              Colors.transparent,
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Center(
-                                                      child: Container(
-                                                        width: 78,
-                                                        height: 78,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                  24),
-                                                          border: Border.all(
-                                                            color: const Color(
-                                                                    0xFFFF4B58)
-                                                                .withValues(
-                                                              alpha: 0.20,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        child: const Icon(
-                                                          Icons.close_rounded,
-                                                          color:
-                                                              Color(0xFFFF4B58),
-                                                          size: 52,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Positioned(
-                                                      left: 28,
-                                                      right: 28,
-                                                      top: 64,
-                                                      child: Transform.rotate(
-                                                        angle: -0.18,
-                                                        child: Container(
-                                                          height: 3,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(999),
-                                                            color: const Color(
-                                                                    0xFFFF4B58)
-                                                                .withValues(
-                                                              alpha: 0.26,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              const SizedBox(height: 10),
-
-                              Opacity(
-                                opacity: _contentFade.value,
-                                child: Transform.translate(
-                                  offset:
-                                      Offset(0, 20 * (1 - _contentFade.value)),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        widget.data.headline,
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headlineMedium
-                                            ?.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w900,
-                                              height: 1.08,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 14),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 18,
-                                          vertical: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF2A0A11),
-                                          borderRadius:
-                                              BorderRadius.circular(999),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              width: 9,
-                                              height: 9,
-                                              decoration: const BoxDecoration(
-                                                color: Color(0xFFFF4B58),
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Text(
-                                              widget.data.badgeLabel,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .labelLarge
-                                                  ?.copyWith(
-                                                    color:
-                                                        const Color(0xFFFF4B58),
-                                                    fontWeight: FontWeight.w900,
-                                                    letterSpacing: 0.7,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 24),
-                                      Text(
-                                        widget.data.summary,
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.copyWith(
-                                              color: const Color(0xFFAEB8D0),
-                                              height: 1.6,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 26),
-                                      Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.all(22),
-                                        decoration: BoxDecoration(
-                                          color: _cardColor,
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          border: Border.all(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.06),
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black
-                                                  .withValues(alpha: 0.22),
-                                              blurRadius: 20,
-                                              spreadRadius: 1,
-                                              offset: const Offset(0, 12),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            if (widget.data.eventName !=
-                                                null) ...[
-                                              Text(
-                                                'Related Event',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .labelMedium
-                                                    ?.copyWith(
-                                                      color:
-                                                          const Color(0xFF6E7FA6),
-                                                      fontWeight:
-                                                          FontWeight.w800,
-                                                      letterSpacing: 1.3,
-                                                    ),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Text(
-                                                widget.data.eventName!,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleLarge
-                                                    ?.copyWith(
-                                                      color: _brandBlue,
-                                                      fontWeight:
-                                                          FontWeight.w800,
-                                                    ),
-                                              ),
-                                              const SizedBox(height: 18),
-                                              Divider(
-                                                height: 1,
-                                                color: Colors.white
-                                                    .withValues(alpha: 0.06),
-                                              ),
-                                              const SizedBox(height: 16),
-                                            ],
-                                            ...List.generate(
-                                              widget.data.reasons.length,
-                                              (index) {
-                                                final reason =
-                                                    widget.data.reasons[index];
-
-                                                return Padding(
-                                                  padding: EdgeInsets.only(
-                                                    top: index == 0 ? 0 : 14,
-                                                  ),
-                                                  child: _FailureReasonTile(
-                                                    reason: reason,
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ),
                               ),
-
-                              const Spacer(flex: 2),
-
-                              Opacity(
-                                opacity: _actionsFade.value,
-                                child: Transform.translate(
-                                  offset:
-                                      Offset(0, 18 * (1 - _actionsFade.value)),
-                                  child: Column(
-                                    children: [
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: ElevatedButton.icon(
-                                          onPressed: () {
-                                            Navigator.of(context).pop(
-                                              ScanFlowExitAction.retry,
-                                            );
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: _brandBlue,
-                                            foregroundColor: Colors.white,
-                                            minimumSize:
-                                                const Size.fromHeight(62),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(22),
-                                            ),
-                                          ),
-                                          icon:
-                                              const Icon(Icons.refresh_rounded),
-                                          label: const Text('Try Again'),
+                              Transform.scale(
+                                scale:
+                                    (0.86 + (_ringExpand.value * 0.45)) *
+                                    ringPulse,
+                                child: Container(
+                                  width: heroHeight * 0.86,
+                                  height: heroHeight * 0.86,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: const Color(
+                                        0xFFFF4B58,
+                                      ).withValues(alpha: 0.10 + glowPulse),
+                                      width: 2.2,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Transform.translate(
+                                offset: Offset(0, _heroLift.value),
+                                child: Transform(
+                                  alignment: Alignment.center,
+                                  transform:
+                                      Matrix4.identity()
+                                        ..setEntry(3, 2, 0.0012)
+                                        ..rotateZ((1 - heroScale) * -0.22)
+                                        ..scale(heroScale),
+                                  child: SizedBox(
+                                    width: coreSize,
+                                    height: coreSize,
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        _SlashBeam(
+                                          angle: -0.62,
+                                          width:
+                                              dense ? 112 : (compact ? 138 : 168),
+                                          height:
+                                              dense ? 12 : (compact ? 15 : 18),
                                         ),
-                                      ),
-                                      const SizedBox(height: 14),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: OutlinedButton.icon(
-                                          onPressed: () {
-                                            Navigator.of(context).pop(
-                                              ScanFlowExitAction.home,
-                                            );
-                                          },
-                                          style: OutlinedButton.styleFrom(
-                                            foregroundColor: Colors.white,
-                                            minimumSize:
-                                                const Size.fromHeight(58),
-                                            side: BorderSide(
-                                              color: Colors.white
-                                                  .withValues(alpha: 0.10),
-                                            ),
-                                            backgroundColor:
-                                                const Color(0xFF07183A),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(22),
-                                            ),
-                                          ),
-                                          icon: const Icon(Icons.home_outlined),
-                                          label: const Text('Return Home'),
+                                        _SlashBeam(
+                                          angle: 0.62,
+                                          width:
+                                              dense ? 112 : (compact ? 138 : 168),
+                                          height:
+                                              dense ? 12 : (compact ? 15 : 18),
                                         ),
-                                      ),
-                                    ],
+                                        Container(
+                                          width:
+                                              dense ? 88 : (compact ? 108 : 132),
+                                          height:
+                                              dense ? 88 : (compact ? 108 : 132),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              36,
+                                            ),
+                                            gradient: const LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Color(0xFF29070C),
+                                                Color(0xFF170408),
+                                                Color(0xFF0E0306),
+                                              ],
+                                            ),
+                                            border: Border.all(
+                                              color: const Color(
+                                                0xFFFF5562,
+                                              ).withValues(alpha: 0.42),
+                                              width: 1.6,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color(
+                                                  0xFFFF4B58,
+                                                ).withValues(alpha: 0.18),
+                                                blurRadius: 28,
+                                                spreadRadius: 2,
+                                                offset: const Offset(0, 12),
+                                              ),
+                                              BoxShadow(
+                                                color: Colors.black.withValues(
+                                                  alpha: 0.28,
+                                                ),
+                                                blurRadius: 18,
+                                                offset: const Offset(0, 12),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              Positioned.fill(
+                                                child: DecoratedBox(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          36,
+                                                        ),
+                                                    gradient: LinearGradient(
+                                                      begin:
+                                                          Alignment.topCenter,
+                                                      end:
+                                                          Alignment
+                                                              .bottomCenter,
+                                                      colors: [
+                                                        Colors.white.withValues(
+                                                          alpha: 0.10,
+                                                        ),
+                                                        Colors.transparent,
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Container(
+                                                  width: dense ? 62 : 78,
+                                                  height: dense ? 62 : 78,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          24,
+                                                        ),
+                                                    border: Border.all(
+                                                      color: const Color(
+                                                        0xFFFF4B58,
+                                                      ).withValues(alpha: 0.20),
+                                                    ),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.close_rounded,
+                                                    color: const Color(
+                                                      0xFFFF4B58,
+                                                    ),
+                                                    size:
+                                                        dense ? 34 : (compact ? 42 : 52),
+                                                  ),
+                                                ),
+                                              ),
+                                              Positioned(
+                                                left: 28,
+                                                right: 28,
+                                                top: 64,
+                                                child: Transform.rotate(
+                                                  angle: -0.18,
+                                                  child: Container(
+                                                    height: 3,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            999,
+                                                          ),
+                                                      color: const Color(
+                                                        0xFFFF4B58,
+                                                      ).withValues(alpha: 0.26),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+
+                        SizedBox(height: dense ? 4 : (compact ? 6 : 10)),
+                        Opacity(
+                          opacity: _contentFade.value,
+                          child: Transform.translate(
+                            offset: Offset(0, 20 * (1 - _contentFade.value)),
+                            child: Column(
+                              children: [
+                                Text(
+                                  widget.data.headline,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineMedium?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    height: 1.08,
+                                    fontSize:
+                                        dense ? 22 : (compact ? 25 : null),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: dense ? 8 : (compact ? 10 : 14),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF2A0A11),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 9,
+                                        height: 9,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFFF4B58),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        widget.data.badgeLabel,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.labelLarge?.copyWith(
+                                          color: const Color(0xFFFF4B58),
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 0.7,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: dense ? 10 : (compact ? 14 : 24),
+                                ),
+                                Text(
+                                  widget.data.summary,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.copyWith(
+                                    color: const Color(0xFFAEB8D0),
+                                    height: 1.6,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: dense ? 12 : (compact ? 16 : 26),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(cardPadding),
+                                  decoration: BoxDecoration(
+                                    color: _cardColor,
+                                    borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.06,
+                                      ),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.22,
+                                        ),
+                                        blurRadius: 20,
+                                        spreadRadius: 1,
+                                        offset: const Offset(0, 12),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (widget.data.eventName != null) ...[
+                                        Text(
+                                          'Related Event',
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.labelMedium?.copyWith(
+                                            color: const Color(0xFF6E7FA6),
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: 1.3,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height:
+                                              dense ? 8 : (compact ? 8 : 10),
+                                        ),
+                                        Text(
+                                          widget.data.eventName!,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge?.copyWith(
+                                            color: _brandBlue,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height:
+                                              dense ? 10 : (compact ? 12 : 18),
+                                        ),
+                                        Divider(
+                                          height: 1,
+                                          color: Colors.white.withValues(
+                                            alpha: 0.06,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height:
+                                              dense ? 10 : (compact ? 12 : 16),
+                                        ),
+                                      ],
+                                      ...List.generate(
+                                        widget.data.reasons.length,
+                                        (index) {
+                                          final reason =
+                                              widget.data.reasons[index];
+
+                                          return Padding(
+                                            padding: EdgeInsets.only(
+                                              top: index == 0 ? 0 : 14,
+                                            ),
+                                            child: _FailureReasonTile(
+                                              reason: reason,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: dense ? 14 : (compact ? 18 : 26)),
+                        Opacity(
+                          opacity: _actionsFade.value,
+                          child: Transform.translate(
+                            offset: Offset(0, 18 * (1 - _actionsFade.value)),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      Navigator.of(
+                                        context,
+                                      ).pop(ScanFlowExitAction.retry);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: _brandBlue,
+                                      foregroundColor: Colors.white,
+                                      minimumSize: Size.fromHeight(
+                                        buttonHeight,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(22),
+                                      ),
+                                    ),
+                                    icon: const Icon(Icons.refresh_rounded),
+                                    label: const Text('Try Again'),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: dense ? 8 : (compact ? 10 : 14),
+                                ),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: OutlinedButton.icon(
+                                    onPressed: () {
+                                      Navigator.of(
+                                        context,
+                                      ).pop(ScanFlowExitAction.home);
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      minimumSize: Size.fromHeight(
+                                        dense ? 48 : (compact ? 52 : 58),
+                                      ),
+                                      side: BorderSide(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.10,
+                                        ),
+                                      ),
+                                      backgroundColor: const Color(0xFF07183A),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(22),
+                                      ),
+                                    ),
+                                    icon: const Icon(Icons.home_outlined),
+                                    label: const Text('Return Home'),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -581,9 +595,7 @@ class _ScanFailureScreenState extends State<ScanFailureScreen>
 }
 
 class _FailureBackdrop extends StatelessWidget {
-  const _FailureBackdrop({
-    required this.wash,
-  });
+  const _FailureBackdrop({required this.wash});
 
   final double wash;
 
@@ -601,11 +613,12 @@ class _FailureBackdrop extends StatelessWidget {
               height: 250,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Color.lerp(
-                    const Color(0xFF17325E).withValues(alpha: 0.18),
-                    const Color(0xFFFF4B58).withValues(alpha: 0.14),
-                    wash,
-                  )!,
+                  color:
+                      Color.lerp(
+                        const Color(0xFF17325E).withValues(alpha: 0.18),
+                        const Color(0xFFFF4B58).withValues(alpha: 0.14),
+                        wash,
+                      )!,
                   width: 2,
                 ),
               ),
@@ -622,11 +635,12 @@ class _FailureBackdrop extends StatelessWidget {
               height: 190,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Color.lerp(
-                    const Color(0xFF17325E).withValues(alpha: 0.14),
-                    const Color(0xFFFF4B58).withValues(alpha: 0.12),
-                    wash,
-                  )!,
+                  color:
+                      Color.lerp(
+                        const Color(0xFF17325E).withValues(alpha: 0.14),
+                        const Color(0xFFFF4B58).withValues(alpha: 0.12),
+                        wash,
+                      )!,
                   width: 1.8,
                 ),
               ),
@@ -715,9 +729,9 @@ class _FailureTopBar extends StatelessWidget {
         Text(
           'QRollCall',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: _ScanFailureScreenState._brandBlue,
-                fontWeight: FontWeight.w900,
-              ),
+            color: _ScanFailureScreenState._brandBlue,
+            fontWeight: FontWeight.w900,
+          ),
         ),
       ],
     );
@@ -743,10 +757,7 @@ class _FailureReasonTile extends StatelessWidget {
             color: _ScanFailureScreenState._cardIconBg,
             borderRadius: BorderRadius.circular(14),
           ),
-          child: Icon(
-            icon,
-            color: const Color(0xFF94A3C5),
-          ),
+          child: Icon(icon, color: const Color(0xFF94A3C5)),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -756,17 +767,17 @@ class _FailureReasonTile extends StatelessWidget {
               Text(
                 reason.title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 reason.description,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFFAEB8D0),
-                      height: 1.45,
-                    ),
+                  color: const Color(0xFFAEB8D0),
+                  height: 1.45,
+                ),
               ),
             ],
           ),

@@ -7,9 +7,8 @@ import 'package:qrollcall_mobile/features/qr_scanner/models/scan_result_models.d
 import 'package:qrollcall_mobile/models/qr_scan_payload.dart';
 
 class QrScannerController extends ChangeNotifier {
-  QrScannerController({
-    required QrScannerApiService qrScannerApiService,
-  }) : _qrScannerApiService = qrScannerApiService;
+  QrScannerController({required QrScannerApiService qrScannerApiService})
+    : _qrScannerApiService = qrScannerApiService;
 
   final QrScannerApiService _qrScannerApiService;
 
@@ -35,7 +34,8 @@ class QrScannerController extends ChangeNotifier {
           _buildGenericFailure(
             headline: 'Unreadable QR Code',
             badge: 'Scanner Error',
-            summary: 'The scanned code does not contain a usable attendance token.',
+            summary:
+                'The scanned code does not contain a usable attendance token.',
             reasons: const [
               ScanFailureReasonItem(
                 iconKind: ScanFailureIconKind.qrCode,
@@ -63,9 +63,10 @@ class QrScannerController extends ChangeNotifier {
             eventName: payload.displayEventName,
             verifiedAt: markResult.scannedAt,
             statusLabel: 'Verified Present',
-            locationLabel: payload.geofenceRadiusMeters != null
-                ? 'Location verified inside ${payload.geofenceRadiusMeters}m geofence'
-                : 'Location verified for this attendance session',
+            locationLabel:
+                payload.geofenceRadiusMeters != null
+                    ? 'Location verified inside ${payload.geofenceRadiusMeters}m geofence'
+                    : 'Location verified for this attendance session',
             eventId: markResult.eventId,
           ),
         );
@@ -78,15 +79,14 @@ class QrScannerController extends ChangeNotifier {
         ),
       );
     } on QrScannerApiException catch (error) {
-      return ScanFailureOutcome(
-        _buildFailureFromApiException(error),
-      );
+      return ScanFailureOutcome(_buildFailureFromApiException(error));
     } on LocationServiceDisabledException {
       return ScanFailureOutcome(
         _buildGenericFailure(
           headline: 'Location Services Off',
           badge: 'Location Required',
-          summary: 'Location services must be enabled before attendance can be recorded.',
+          summary:
+              'Location services must be enabled before attendance can be recorded.',
           reasons: const [
             ScanFailureReasonItem(
               iconKind: ScanFailureIconKind.location,
@@ -102,7 +102,8 @@ class QrScannerController extends ChangeNotifier {
         _buildGenericFailure(
           headline: 'Location Permission Needed',
           badge: 'Permission Required',
-          summary: 'QRollCall needs location access to verify the event geofence.',
+          summary:
+              'QRollCall needs location access to verify the event geofence.',
           reasons: const [
             ScanFailureReasonItem(
               iconKind: ScanFailureIconKind.lock,
@@ -118,7 +119,8 @@ class QrScannerController extends ChangeNotifier {
         _buildGenericFailure(
           headline: 'Scan Failed',
           badge: 'Unexpected Error',
-          summary: 'An unexpected issue occurred while processing your attendance.',
+          summary:
+              'An unexpected issue occurred while processing your attendance.',
           reasons: [
             ScanFailureReasonItem(
               iconKind: ScanFailureIconKind.warning,
@@ -152,9 +154,7 @@ class QrScannerController extends ChangeNotifier {
     }
 
     return Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-      ),
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     );
   }
 
@@ -166,34 +166,92 @@ class QrScannerController extends ChangeNotifier {
     QrScannerApiException exception,
   ) {
     final reason = exception.message.toLowerCase();
+    final message =
+        exception.message.trim().isEmpty
+            ? 'The backend rejected this attendance scan.'
+            : exception.message.trim();
 
     if (exception.statusCode == 409 || reason.contains('already marked')) {
       return _buildGenericFailure(
         headline: 'Attendance Already Marked',
         badge: 'Duplicate Scan',
-        summary: 'This account has already been recorded for the scanned event.',
-        reasons: const [
+        summary: message,
+        reasons: [
           ScanFailureReasonItem(
             iconKind: ScanFailureIconKind.shield,
             title: 'Duplicate attendance blocked',
-            description:
-                'QRollCall prevents multiple present records for the same user and event.',
+            description: message,
           ),
         ],
       );
     }
 
-    if (exception.statusCode == 404 || reason.contains('invalid qr')) {
+    if (reason.contains('expired')) {
       return _buildGenericFailure(
-        headline: 'Invalid QR Code',
+        headline: 'Event Expired',
         badge: 'Verification Error',
-        summary: 'The scanned code is not recognized by the current event registry.',
-        reasons: const [
+        summary: message,
+        reasons: [
+          ScanFailureReasonItem(
+            iconKind: ScanFailureIconKind.time,
+            title: 'Attendance window closed',
+            description: message,
+          ),
+        ],
+      );
+    }
+
+    if (reason.contains('time window') ||
+        reason.contains('too early') ||
+        reason.contains('too late')) {
+      return _buildGenericFailure(
+        headline: 'Outside Time Window',
+        badge: 'Verification Error',
+        summary: message,
+        reasons: [
+          ScanFailureReasonItem(
+            iconKind: ScanFailureIconKind.time,
+            title: 'Time check failed',
+            description: message,
+          ),
+        ],
+      );
+    }
+
+    if (reason.contains('geofence') ||
+        reason.contains('location') ||
+        reason.contains('outside')) {
+      return _buildGenericFailure(
+        headline: 'Wrong Location',
+        badge: 'Location Required',
+        summary: message,
+        reasons: [
+          ScanFailureReasonItem(
+            iconKind: ScanFailureIconKind.location,
+            title: 'Location check failed',
+            description: message,
+          ),
+        ],
+      );
+    }
+
+    if (exception.statusCode == 404 ||
+        exception.statusCode == 400 ||
+        reason.contains('invalid qr') ||
+        reason.contains('token not found') ||
+        reason.contains('not found')) {
+      return _buildGenericFailure(
+        headline:
+            reason.contains('token not found')
+                ? 'QR Token Not Found'
+                : 'Invalid QR Code',
+        badge: 'Verification Error',
+        summary: message,
+        reasons: [
           ScanFailureReasonItem(
             iconKind: ScanFailureIconKind.qrCode,
             title: 'Token not recognized',
-            description:
-                'The event QR code may be expired, corrupted, or generated for a different session.',
+            description: message,
           ),
         ],
       );
@@ -203,7 +261,8 @@ class QrScannerController extends ChangeNotifier {
       return _buildGenericFailure(
         headline: 'Session Expired',
         badge: 'Authentication Required',
-        summary: 'Your sign-in session is no longer valid for attendance marking.',
+        summary:
+            'Your sign-in session is no longer valid for attendance marking.',
         reasons: const [
           ScanFailureReasonItem(
             iconKind: ScanFailureIconKind.lock,
@@ -254,9 +313,10 @@ class QrScannerController extends ChangeNotifier {
     }
 
     if (normalized.contains('geofence') || normalized.contains('location')) {
-      final radiusText = payload.geofenceRadiusMeters != null
-          ? 'Move inside the designated ${payload.geofenceRadiusMeters}m event zone and try again.'
-          : 'Move inside the designated event zone and try again.';
+      final radiusText =
+          payload.geofenceRadiusMeters != null
+              ? 'Move inside the designated ${payload.geofenceRadiusMeters}m event zone and try again.'
+              : 'Move inside the designated event zone and try again.';
 
       return _buildGenericFailure(
         headline: 'Wrong Location',
